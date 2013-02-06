@@ -6,10 +6,48 @@ Renderer::Renderer()
 	if((error = glewInit()) != GLEW_OK) {
 		throw std::runtime_error((const char*)glewGetErrorString(error));
 	}
+	//~ Loading object
+	m_object = new Object("models/sphere.obj");
+	//~ Compiling shaders
+	m_basic_shader_program = loadProgram("shaders/basic.vertex.glsl","shaders/basic.fragment.glsl");
+	m_lighting_shader_program = loadProgram("shaders/lighting.vertex.glsl","shaders/lighting.fragment.glsl");
+	//~ Locating uniforms
+	m_basic_shader_model_matrix_position = glGetUniformLocation(m_basic_shader_program,"model_matrix");
+	m_basic_shader_view_matrix_position = glGetUniformLocation(m_basic_shader_program,"view_matrix");
+	m_basic_shader_projection_matrix_position = glGetUniformLocation(m_basic_shader_program,"projection_matrix");
+	
+	m_lighting_shader_model_matrix_position = glGetUniformLocation(m_lighting_shader_program,"model_matrix");
+	m_lighting_shader_view_matrix_position = glGetUniformLocation(m_lighting_shader_program,"view_matrix");
+	m_lighting_shader_projection_matrix_position = glGetUniformLocation(m_lighting_shader_program,"projection_matrix");
+	m_lighting_shader_camera_position = glGetUniformLocation(m_lighting_shader_program,"camera_position");
+	//~ Creating camera
+	glm::vec3 cam_one_position = glm::vec3(0.0f,0.0f,5.0f);
+	glm::vec3 cam_one_up = glm::vec3(0.0f,1.0f,0.0f);
+	glm::vec3 cam_one_target = glm::vec3(0.0f,0.0f,0.0f);
+	m_camera_one = new Camera(cam_one_position,cam_one_up,cam_one_target);
 }
 
 Renderer::~Renderer()
 {
+	delete m_object;
+	delete m_camera_one;
+}
+
+void Renderer::render()
+{
+	//~ Choosing shader
+	glUseProgram(m_lighting_shader_program);
+	//~ Sending uniforms
+	glUniformMatrix4fv(m_lighting_shader_model_matrix_position, 1, GL_FALSE, glm::value_ptr(m_object->get_model_matrix()));
+	glUniformMatrix4fv(m_lighting_shader_view_matrix_position, 1, GL_FALSE, glm::value_ptr(m_camera_one->get_view_matrix()));
+	glUniformMatrix4fv(m_lighting_shader_projection_matrix_position, 1, GL_FALSE, glm::value_ptr(m_camera_one->get_projection_matrix()));
+	glUniform3fv(m_lighting_shader_camera_position, GL_FALSE, glm::value_ptr(m_camera_one->get_position()));
+	//~ Binding vao
+	glBindVertexArray(m_object->get_vao());
+	//~ Drawing
+	glDrawArrays(GL_TRIANGLES, 0, m_object->get_size());
+	//~ Unbind
+	glBindVertexArray(0);
 }
 
 const char* Renderer::readFile(const char* filePath) {

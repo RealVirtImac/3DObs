@@ -8,6 +8,8 @@
 
 #include "glm/glm.hpp"
 #include "glm/gtc/type_ptr.hpp"
+#include "Object.hpp"
+#include "Camera.hpp"
 
 class Renderer
 {
@@ -15,7 +17,23 @@ class Renderer
 		Renderer();
 		~Renderer();
 		
+		void render();
+		
 	private:
 		const char* readFile(const char* filePath);
 		GLuint loadProgram(const char* vertexShaderFile, const char* fragmentShaderFile);
+		
+		Object* m_object;
+		Camera* m_camera_one;
+		
+		GLuint m_basic_shader_program;
+		GLuint m_basic_shader_model_matrix_position;
+		GLuint m_basic_shader_view_matrix_position;
+		GLuint m_basic_shader_projection_matrix_position;
+		
+		GLuint m_lighting_shader_program;
+		GLuint m_lighting_shader_model_matrix_position;
+		GLuint m_lighting_shader_view_matrix_position;
+		GLuint m_lighting_shader_projection_matrix_position;
+		GLuint m_lighting_shader_camera_position;
 };

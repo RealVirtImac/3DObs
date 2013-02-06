@@ -70,9 +70,10 @@ void Application::on_event(SDL_Event* Event)
 void Application::on_render()
 {
 	glClearColor(0.0,0.0,0.0,1.0);
-	glClear(GL_COLOR_BUFFER_BIT);
-	
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
+	
+	m_renderer->render();
 	
 	SDL_GL_SwapBuffers();
 }
