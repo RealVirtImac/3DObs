@@ -23,4 +23,6 @@ class Application
 		bool m_running;
 		SDL_Surface* m_display;
 		Renderer* m_renderer;
+		int m_mouse_x;
+		int m_mouse_y;
 };

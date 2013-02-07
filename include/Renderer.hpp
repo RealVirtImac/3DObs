@@ -19,6 +19,8 @@ class Renderer
 		
 		void render();
 		
+		Camera* get_camera_one() const;
+		
 	private:
 		const char* readFile(const char* filePath);
 		GLuint loadProgram(const char* vertexShaderFile, const char* fragmentShaderFile);

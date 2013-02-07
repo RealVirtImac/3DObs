@@ -5,7 +5,7 @@ Object::Object(const char* filename)
 	//~ Loading OBJ
 	load_OBJ(filename, m_vertices, m_uvs, m_normals);
 	//~ Initializing model matrix
-	m_model_matrix = glm::mat4(1.0);
+	m_model_matrix = glm::scale(glm::mat4(1.0),glm::vec3(0.15f,0.15f,0.15f));
 	//~ Creating buffers
 	create_buffers();
 }

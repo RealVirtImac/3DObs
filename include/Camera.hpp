@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cmath>
+
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
@@ -15,6 +17,12 @@ class Camera
 		glm::mat4 get_view_matrix() const;
 		glm::mat4 get_projection_matrix() const;
 		glm::vec3 get_position() const;
+		
+		void update_horizontal_angle(const int mouse_x);
+		void update_vertical_angle(const int mouse_y);
+		void update_target();
+		void compute_right();
+		void update_position(const int up_down);
 	
 	private:
 		float m_fov;
@@ -28,4 +36,9 @@ class Camera
 		
 		glm::mat4 m_view_matrix;
 		glm::mat4 m_projection_matrix;
+		
+		float m_horizontal_angle;
+		float m_vertical_angle;
+		float m_speed;
+		float m_mouse_speed;
 };
