@@ -3,6 +3,7 @@
 #include <GL/glew.h>
 #include <vector>
 #include <iostream>
+#include <SDL/SDL.h>
 
 #include "ObjLoader.hpp"
 #include "glm/glm.hpp"
@@ -16,6 +17,7 @@ class Object
 		~Object();
 		
 		void create_buffers();
+		void load_textures();
 		
 		unsigned int get_size() const;
 		GLuint get_vao() const;
@@ -32,4 +34,7 @@ class Object
 		GLuint m_object_vertices_vbo;
 		GLuint m_object_normals_vbo;
 		GLuint m_object_uvs_vbo;
+		
+		SDL_Surface* m_diffuse_texture_surface;
+		GLuint m_diffuse_texture;
 };

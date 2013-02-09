@@ -1,13 +1,13 @@
 #include "../include/Renderer.hpp"
 
-Renderer::Renderer()
+Renderer::Renderer():m_drawing_mode(false)
 {
 	GLenum error;
 	if((error = glewInit()) != GLEW_OK) {
 		throw std::runtime_error((const char*)glewGetErrorString(error));
 	}
 	//~ Loading object
-	m_object = new Object("models/sphere.obj");
+	m_object = new Object("models/cube_map.obj");
 	//~ Compiling shaders
 	m_basic_shader_program = loadProgram("shaders/basic.vertex.glsl","shaders/basic.fragment.glsl");
 	m_lighting_shader_program = loadProgram("shaders/lighting.vertex.glsl","shaders/lighting.fragment.glsl");
@@ -20,13 +20,12 @@ Renderer::Renderer()
 	m_lighting_shader_view_matrix_position = glGetUniformLocation(m_lighting_shader_program,"view_matrix");
 	m_lighting_shader_projection_matrix_position = glGetUniformLocation(m_lighting_shader_program,"projection_matrix");
 	m_lighting_shader_camera_position = glGetUniformLocation(m_lighting_shader_program,"camera_position");
+	m_lighting_shader_diffuse_texture = glGetUniformLocation(m_lighting_shader_program, "diffuse_texture");
 	//~ Creating camera
 	glm::vec3 cam_one_position = glm::vec3(0.0f,0.0f,5.0f);
 	glm::vec3 cam_one_up = glm::vec3(0.0f,1.0f,0.0f);
 	glm::vec3 cam_one_target = glm::vec3(0.0f,0.0f,0.0f);
 	m_camera_one = new Camera(cam_one_position,cam_one_up,cam_one_target);
-	
-	std::cout << m_object->get_size() << std::endl;
 }
 
 Renderer::~Renderer()
@@ -44,10 +43,17 @@ void Renderer::render()
 	glUniformMatrix4fv(m_lighting_shader_view_matrix_position, 1, GL_FALSE, glm::value_ptr(m_camera_one->get_view_matrix()));
 	glUniformMatrix4fv(m_lighting_shader_projection_matrix_position, 1, GL_FALSE, glm::value_ptr(m_camera_one->get_projection_matrix()));
 	glUniform3fv(m_lighting_shader_camera_position, GL_FALSE, glm::value_ptr(m_camera_one->get_position()));
+	glUniform1i(m_lighting_shader_diffuse_texture, 0);
 	//~ Binding vao
 	glBindVertexArray(m_object->get_vao());
 	//~ Drawing
-	glDrawArrays(GL_TRIANGLES, 0, m_object->get_size());
+	switch(m_drawing_mode)
+	{
+		case false : glDrawArrays(GL_TRIANGLES, 0, m_object->get_size());
+		break;
+		case true : glDrawArrays(GL_LINE_LOOP, 0, m_object->get_size());
+		break;
+	}
 	//~ Unbind
 	glBindVertexArray(0);
 }
@@ -159,4 +165,9 @@ GLuint Renderer::loadProgram(const char* vertexShaderFile, const char* fragmentS
 Camera* Renderer::get_camera_one() const
 {
 	return m_camera_one;
+}
+
+void Renderer::switch_drawing_mode()
+{
+	m_drawing_mode = !m_drawing_mode;
 }
