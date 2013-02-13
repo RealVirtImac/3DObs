@@ -29,7 +29,7 @@ bool Application::on_init()
 	SDL_GetMouseState(&m_mouse_x,&m_mouse_y);
 	SDL_ShowCursor(SDL_DISABLE); 
 	
-	SDL_EnableKeyRepeat(10, 10);
+	SDL_EnableKeyRepeat(40, 10);
 	return true;
 }
 
@@ -92,6 +92,9 @@ void Application::on_event(SDL_Event* Event)
 			break;
 			//~ Right
 			case SDLK_d : m_renderer->get_camera_one()->update_position(3);
+			break;
+			//~ Wireframe
+			case SDLK_w : m_renderer->switch_drawing_mode();
 			break;
 			default : ;
 			break;

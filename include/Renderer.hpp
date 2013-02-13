@@ -21,8 +21,13 @@ class Renderer
 		
 		Camera* get_camera_one() const;
                 Camera* get_camera_two() const;
+
+		void switch_drawing_mode();
+
 		
 	private:
+		bool m_drawing_mode;
+	
 		const char* readFile(const char* filePath);
 		GLuint loadProgram(const char* vertexShaderFile, const char* fragmentShaderFile);
 		
@@ -40,4 +45,5 @@ class Renderer
 		GLuint m_lighting_shader_view_matrix_position;
 		GLuint m_lighting_shader_projection_matrix_position;
 		GLuint m_lighting_shader_camera_position;
+		GLuint m_lighting_shader_diffuse_texture;
 };
