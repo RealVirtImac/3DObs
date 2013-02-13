@@ -24,15 +24,17 @@ Renderer::Renderer()
 	glm::vec3 cam_one_position = glm::vec3(0.0f,0.0f,5.0f);
 	glm::vec3 cam_one_up = glm::vec3(0.0f,1.0f,0.0f);
 	glm::vec3 cam_one_target = glm::vec3(0.0f,0.0f,0.0f);
-	m_camera_one = new Camera(cam_one_position,cam_one_up,cam_one_target);
-	
+        m_camera_one = new Camera(cam_one_position,cam_one_up,cam_one_target, 0);
+        m_camera_two = new Camera(cam_one_position,cam_one_up,cam_one_target, 1);
+
 	std::cout << m_object->get_size() << std::endl;
 }
 
 Renderer::~Renderer()
 {
 	delete m_object;
-	delete m_camera_one;
+        delete m_camera_one;
+        delete m_camera_two;
 }
 
 void Renderer::render()
@@ -159,4 +161,9 @@ GLuint Renderer::loadProgram(const char* vertexShaderFile, const char* fragmentS
 Camera* Renderer::get_camera_one() const
 {
 	return m_camera_one;
+}
+
+Camera* Renderer::get_camera_two() const
+{
+        return m_camera_two;
 }

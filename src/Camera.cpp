@@ -1,7 +1,8 @@
 #include "../include/Camera.hpp"
 
-Camera::Camera(glm::vec3 cam_one_position, glm::vec3 cam_one_up, glm::vec3 cam_one_target):
-	m_fov(45.0f),
+Camera::Camera(glm::vec3 cam_one_position, glm::vec3 cam_one_up, glm::vec3 cam_one_target, int type):
+        m_type(type),
+        m_fov(45.0f),
 	m_ratio(1280.0/720.0),
 	m_near(1.0f),
 	m_far(100.0f),
@@ -12,7 +13,7 @@ Camera::Camera(glm::vec3 cam_one_position, glm::vec3 cam_one_up, glm::vec3 cam_o
 	m_vertical_angle(0.0f),
 	m_speed(0.15f),
 	m_mouse_speed(0.005f)
-{
+{    
 	compute_view_matrix();
 	compute_projection_matrix();
 }
@@ -28,7 +29,43 @@ void Camera::compute_view_matrix()
 
 void Camera::compute_projection_matrix()
 {
-	m_projection_matrix = glm::perspective(m_fov, m_ratio, m_near, m_far);
+        //CONST TPS
+        float dc = 2.0;
+        float dioc = 0.65;
+        //!CONST TPS
+
+        //Frustum (left camera)
+        if (m_type ==0)
+        {
+            float top, bottom, left, right;
+            top = m_near * tan(m_fov/2);
+            bottom = -top;
+            float a = m_ratio * tan(m_fov/2) * dc;
+            float b = a - dioc/2;
+            float c = a + dioc/2;
+            left = -b * m_near/dc;
+            right   =  c * m_near/dc;
+
+            m_projection_matrix = glm::frustum(left, right, bottom, top, m_near, m_far);
+            m_projection_matrix *= glm::translate(glm::mat4(1.0f), glm::vec3(dioc/2, 0.0f, 0.0f));
+        }
+
+        //Frustum (right camera)
+        else if (m_type == 1)
+        {
+            float top, bottom, left, right;
+            top = m_near * tan(m_fov/2);
+            bottom = -top;
+            float a = m_ratio * tan(m_fov/2) * dc;
+            float b = a - dioc/2;
+            float c = a + dioc/2;
+            left = -c * m_near/dc;
+            right   =  b * m_near/dc;
+
+            m_projection_matrix = glm::frustum(left, right, bottom, top, m_near, m_far);
+            m_projection_matrix *= glm::translate(glm::mat4(1.0f), glm::vec3(dioc/2, 0.0f, 0.0f));
+        }
+        //m_projection_matrix = glm::perspective(m_fov, m_ratio, m_near, m_far);
 }
 
 glm::mat4 Camera::get_view_matrix() const

@@ -7,6 +7,14 @@
 
 3DObs
 
+#IDE's files#
+#############
+3DObs.config
+3DObs.creator
+3DObs.creator.user
+3DObs.files
+3DObs.includes
+
 # OS generated files #
 ######################
 .DS_Store
