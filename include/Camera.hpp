@@ -8,7 +8,7 @@
 class Camera
 {
 	public:
-		Camera(glm::vec3 cam_one_position, glm::vec3 cam_one_up, glm::vec3 cam_one_target, int width, int height);
+                Camera(glm::vec3 cam_one_position, glm::vec3 cam_one_up, glm::vec3 cam_one_target, int width, int height, int type);
 		~Camera();
 		
 		void compute_view_matrix();
@@ -25,6 +25,7 @@ class Camera
 		void update_position(const int up_down);
 	
 	private:
+                int m_type;
 		float m_fov;
 		float m_ratio;
 		float m_near;

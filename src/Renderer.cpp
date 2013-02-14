@@ -35,7 +35,7 @@ Renderer::Renderer(int width, int height):m_drawing_mode(false)
 	glm::vec3 cam_one_position = glm::vec3(0.0f,0.0f,5.0f);
 	glm::vec3 cam_one_up = glm::vec3(0.0f,1.0f,0.0f);
 	glm::vec3 cam_one_target = glm::vec3(0.0f,0.0f,0.0f);
-	m_camera_one = new Camera(cam_one_position,cam_one_up,cam_one_target,m_width,m_height);
+        m_camera_one = new Camera(cam_one_position,cam_one_up,cam_one_target,m_width,m_height, 0);
 	
 	//Generating textures
 	glGenTextures(1, &m_left_render_texture);
