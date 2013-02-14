@@ -13,15 +13,18 @@
 class Object
 {
 	public:
-		explicit Object(const char* filename);
+		Object(const char* filename, const char* texture_path);
 		~Object();
 		
 		void create_buffers();
 		void load_textures();
 		
+		GLuint get_diffuse_texture() const;
 		unsigned int get_size() const;
 		GLuint get_vao() const;
 		glm::mat4 get_model_matrix() const;
+		
+		void set_model_matrix(const glm::mat4 input_matrix);
 		
 	private:
 		std::vector<glm::vec3> m_vertices;
@@ -35,6 +38,7 @@ class Object
 		GLuint m_object_normals_vbo;
 		GLuint m_object_uvs_vbo;
 		
+		const char* m_texture_path;
 		SDL_Surface* m_diffuse_texture_surface;
 		GLuint m_diffuse_texture;
 };

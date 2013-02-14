@@ -16,7 +16,7 @@ out vec3 position;
 void main(void)
 {	
 	uv = UV;
-	normal = vec3(model_matrix * vec4(Normal, 1.0));; 
+	normal = vec3(model_matrix * vec4(Normal, 1.0));
 	position = vec3(model_matrix * vec4(Position, 1.0));
 	gl_Position = projection_matrix * view_matrix * model_matrix * vec4(Position,1.0);
 }

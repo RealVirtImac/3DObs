@@ -1,21 +1,28 @@
 #include "../include/Object.hpp"
 
-Object::Object(const char* filename)
+Object::Object(const char* filename, const char* texture_path)
 {
 	//~ Loading OBJ
 	load_OBJ(filename, m_vertices, m_uvs, m_normals);
 	//~ Initializing model matrix
-	m_model_matrix = glm::scale(glm::mat4(1.0),glm::vec3(0.025f,0.025f,0.025f));
+	m_model_matrix = glm::mat4(1.0);
 	//~ Creating buffers
 	create_buffers();
 	//~ Load texture
-	load_textures();
+	if(texture_path != NULL)
+	{
+		m_texture_path = texture_path;
+		load_textures();
+	}
 }
 
 Object::~Object()
 {
-	glDeleteTextures(1, &m_diffuse_texture);
-	SDL_FreeSurface(m_diffuse_texture_surface);
+	if(m_texture_path != NULL)
+	{
+		glDeleteTextures(1, &m_diffuse_texture);
+		SDL_FreeSurface(m_diffuse_texture_surface);
+	}
 	
 	glDeleteBuffers(1,&m_object_vertices_vbo);
 	glDeleteBuffers(1,&m_object_normals_vbo);
@@ -55,7 +62,7 @@ void Object::create_buffers()
 
 void Object::load_textures()
 {
-	if((m_diffuse_texture_surface = SDL_LoadBMP("textures/cube_map_tex.bmp")))
+	if((m_diffuse_texture_surface = SDL_LoadBMP(m_texture_path)))
 	{
 		//~ Properties
 		GLenum texture_format;
@@ -82,7 +89,14 @@ void Object::load_textures()
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glBindTexture(GL_TEXTURE_2D, 0);
 	}
+}
+
+//~ Setters
+void Object::set_model_matrix(const glm::mat4 input_matrix)
+{
+	m_model_matrix = input_matrix;
 }
 
 //~ Getters
@@ -99,4 +113,9 @@ unsigned int Object::get_size() const
 glm::mat4 Object::get_model_matrix() const
 {
 	return m_model_matrix;
+}
+
+GLuint Object::get_diffuse_texture() const
+{
+	return m_diffuse_texture;
 }

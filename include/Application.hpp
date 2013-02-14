@@ -25,4 +25,7 @@ class Application
 		Renderer* m_renderer;
 		int m_mouse_x;
 		int m_mouse_y;
+		
+		int m_width;
+		int m_height;
 };

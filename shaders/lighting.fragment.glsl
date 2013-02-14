@@ -1,14 +1,14 @@
 #version 150
 #extension GL_ARB_explicit_attrib_location : enable
 
+layout(location = 0) out vec3 FragColor;
+
 uniform vec3 camera_position;
 uniform sampler2D diffuse_texture;
 
 in vec2 uv;
 in vec3 position;
 in vec3 normal;
-
-out vec4 FragColor;
 
 vec3 PointLight(vec3 lightPosition, vec3 lightColor, float LightIntensity, float spec, vec3 n, vec3 diffuse)
 {
@@ -57,5 +57,5 @@ void main(void)
 	lightPosition = vec3(distance, -distance, -distance);
 	vec3 pl8 = PointLight(lightPosition,lightColor,lightIntensity,specular, n, diffuse);
 	
-	FragColor = vec4(pl1+pl2+pl3+pl4+pl5+pl6+pl7+pl8, 1.0);
+	FragColor = vec3(pl1+pl2+pl3+pl4+pl5+pl6+pl7+pl8);
 }

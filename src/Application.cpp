@@ -17,15 +17,18 @@ bool Application::on_init()
 	
 	SDL_WM_SetCaption("3DObs",0);
 	
-	if((m_display = SDL_SetVideoMode(1280,720,32, SDL_HWSURFACE|SDL_DOUBLEBUF|SDL_OPENGL)) == NULL)
+	m_width = 1280;
+	m_height = 720;
+	
+	if((m_display = SDL_SetVideoMode(m_width,m_height,32, SDL_HWSURFACE|SDL_DOUBLEBUF|SDL_OPENGL)) == NULL)
 	{
 		return false;
 	}
 	
-	m_renderer = new Renderer();
+	m_renderer = new Renderer(m_width,m_height);
 	
 	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-	SDL_WarpMouse(1280.0/2, 720.0/2);
+	SDL_WarpMouse(m_width/2, m_height/2);
 	SDL_GetMouseState(&m_mouse_x,&m_mouse_y);
 	SDL_ShowCursor(SDL_DISABLE); 
 	
@@ -60,7 +63,7 @@ int Application::on_execute()
 
 void Application::on_loop()
 {
-	SDL_WarpMouse(1280.0/2, 720.0/2);
+	SDL_WarpMouse(m_width/2, m_height/2);
 	SDL_GetMouseState(&m_mouse_x,&m_mouse_y);
 	
 	m_renderer->get_camera_one()->update_horizontal_angle(m_mouse_x);
@@ -104,10 +107,6 @@ void Application::on_event(SDL_Event* Event)
 
 void Application::on_render()
 {
-	glClearColor(0.0,0.0,0.0,1.0);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glEnable(GL_DEPTH_TEST);
-	
 	m_renderer->render();
 	
 	SDL_GL_SwapBuffers();
