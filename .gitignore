@@ -9,11 +9,11 @@
 
 #IDE's files#
 #############
-3DObs.config
-3DObs.creator
-3DObs.creator.user
-3DObs.files
-3DObs.includes
+*.config
+*.creator
+*.creator.user
+*.files
+*.includes
 
 # OS generated files #
 ######################
