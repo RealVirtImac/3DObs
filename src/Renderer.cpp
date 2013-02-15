@@ -33,11 +33,13 @@ Renderer::Renderer(int width, int height):m_drawing_mode(false)
 	m_quad_shader_texture_2 = glGetUniformLocation(m_quad_shader, "renderedTexture2");
 	
 	//~ Creating camera
-	glm::vec3 cam_one_position = glm::vec3(0.0f,0.0f,5.0f);
-	glm::vec3 cam_one_up = glm::vec3(0.0f,1.0f,0.0f);
-	glm::vec3 cam_one_target = glm::vec3(0.0f,0.0f,0.0f);
-	m_camera_one = new Camera(cam_one_position,cam_one_up,cam_one_target,m_width,m_height, 0);
-	m_camera_two = new Camera(cam_one_position,cam_one_up,cam_one_target,m_width,m_height, 1);
+	m_camera_one = new Camera(m_width,m_height, 0);
+	m_camera_two = new Camera(m_width,m_height, 1);
+	
+	glm::vec3 rig_position = glm::vec3(0.0f,0.0f,5.0f);
+	glm::vec3 rig_up = glm::vec3(0.0f,1.0f,0.0f);
+	glm::vec3 rig_target = glm::vec3(0.0f,0.0f,1.0f);
+	m_rig = new Rig(m_camera_one,m_camera_two,rig_position,rig_up,rig_target,m_width,m_height);
 	
 	//Generating textures
 	glGenTextures(1, &m_left_render_texture);
@@ -122,6 +124,7 @@ Renderer::~Renderer()
 	delete m_quad;
 	delete m_camera_one;
 	delete m_camera_two;
+	delete m_rig;
 }
 
 void Renderer::render()
@@ -319,6 +322,11 @@ GLuint Renderer::loadProgram(const char* vertexShaderFile, const char* fragmentS
     delete [] fragmentShaderSource;
 
     return program;
+}
+
+Rig* Renderer::get_rig() const
+{
+	return m_rig;
 }
 
 Camera* Renderer::get_camera_one() const

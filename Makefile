@@ -5,8 +5,9 @@ EXEC = 3DObs
 
 all: $(EXEC)
 
-$(EXEC): Application.o Object.o Renderer.o Camera.o ObjLoader.o main.o
-	$(CXX) -o $(EXEC) Application.o Object.o Renderer.o Camera.o ObjLoader.o main.o $(CFLAGS) $(LDFLAGS)
+$(EXEC): Application.o Object.o Renderer.o Camera.o ObjLoader.o Rig.o main.o
+	$(CXX) -o $(EXEC) Application.o Object.o Renderer.o Camera.o ObjLoader.o Rig.o main.o $(CFLAGS) $(LDFLAGS)
+	rm -rf *.o
 
 ObjLoader.o: src/ObjLoader.cpp include/ObjLoader.hpp
 	$(CXX) -c src/ObjLoader.cpp $(CFLAGS)
@@ -19,6 +20,9 @@ Object.o: src/Object.cpp include/Object.hpp
 
 Renderer.o: src/Renderer.cpp include/Renderer.hpp
 	$(CXX) -c src/Renderer.cpp $(CFLAGS)
+
+Rig.o: src/Rig.cpp include/Rig.hpp
+	$(CXX) -c src/Rig.cpp $(CFLAGS)
 
 Application.o: src/Application.cpp include/Application.hpp
 	$(CXX) -c src/Application.cpp $(CFLAGS)

@@ -10,6 +10,7 @@
 #include "glm/gtc/type_ptr.hpp"
 #include "Object.hpp"
 #include "Camera.hpp"
+#include "Rig.hpp"
 
 class Renderer
 {
@@ -19,6 +20,7 @@ class Renderer
 		
 		void render();
 		
+		Rig* get_rig() const;
 		Camera* get_camera_one() const;
 		Camera* get_camera_two() const;
 		void switch_drawing_mode();
@@ -32,6 +34,7 @@ class Renderer
 		const char* readFile(const char* filePath);
 		GLuint loadProgram(const char* vertexShaderFile, const char* fragmentShaderFile);
 		
+		Rig* m_rig;
 		Object* m_object;
 		Object* m_quad;
 		Camera* m_camera_one;

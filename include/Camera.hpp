@@ -8,7 +8,7 @@
 class Camera
 {
 	public:
-                Camera(glm::vec3 cam_one_position, glm::vec3 cam_one_up, glm::vec3 cam_one_target, int width, int height, int type);
+		Camera(int width, int height, int type);
 		~Camera();
 		
 		void compute_view_matrix();
@@ -18,14 +18,17 @@ class Camera
 		glm::mat4 get_projection_matrix() const;
 		glm::vec3 get_position() const;
 		
-		void update_horizontal_angle(const int mouse_x);
-		void update_vertical_angle(const int mouse_y);
+		void set_position(const glm::vec3 position);
+		void set_target(const glm::vec3 target);
+		void set_up(const glm::vec3 up);
+		void set_horizontal_angle(float angle);
+		void set_vertical_angle(float angle);
+		
 		void update_target();
 		void compute_right();
-		void update_position(const int up_down);
 	
 	private:
-                int m_type;
+		int m_type;
 		float m_fov;
 		float m_ratio;
 		float m_near;
@@ -34,6 +37,7 @@ class Camera
 		glm::vec3 m_position;
 		glm::vec3 m_up;
 		glm::vec3 m_target;
+		glm::vec3 m_right;
 		
 		glm::mat4 m_view_matrix;
 		glm::mat4 m_projection_matrix;

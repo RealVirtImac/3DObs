@@ -66,14 +66,11 @@ void Application::on_loop()
 	SDL_WarpMouse(m_width/2, m_height/2);
 	SDL_GetMouseState(&m_mouse_x,&m_mouse_y);
 	
-	m_renderer->get_camera_one()->update_horizontal_angle(m_mouse_x);
-	m_renderer->get_camera_one()->update_vertical_angle(m_mouse_y);
-	m_renderer->get_camera_one()->update_target();
-	m_renderer->get_camera_one()->compute_view_matrix();
+	m_renderer->get_rig()->update_horizontal_angle(m_mouse_x);
+	m_renderer->get_rig()->update_vertical_angle(m_mouse_y);
+	m_renderer->get_rig()->update_target();
 	
-	m_renderer->get_camera_two()->update_horizontal_angle(m_mouse_x);
-	m_renderer->get_camera_two()->update_vertical_angle(m_mouse_y);
-	m_renderer->get_camera_two()->update_target();
+	m_renderer->get_camera_one()->compute_view_matrix();
 	m_renderer->get_camera_two()->compute_view_matrix();
 }
 
@@ -90,20 +87,16 @@ void Application::on_event(SDL_Event* Event)
 			case SDLK_ESCAPE: m_running = false;
 			break;
 			//~ Forward
-			case SDLK_z : 	
-							
+			case SDLK_z :	m_renderer->get_rig()->update_position(1);
 			break;
 			//~ Backward
-			case SDLK_s : 	
-							
+			case SDLK_s : 	m_renderer->get_rig()->update_position(0);
 			break;
 			//~ Left
-			case SDLK_q : 	
-							
+			case SDLK_q : 	m_renderer->get_rig()->update_position(2);
 			break;
 			//~ Right
-			case SDLK_d : 	
-							
+			case SDLK_d : 	m_renderer->get_rig()->update_position(3);
 			break;
 			//~ Wireframe
 			case SDLK_w : m_renderer->switch_drawing_mode();
