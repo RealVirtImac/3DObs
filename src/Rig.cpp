@@ -86,6 +86,12 @@ void Rig::update_target()
 	m_camera_two->set_target(m_target);
 }
 
+//~ Getters
+glm::vec3 Rig::get_position() const
+{
+	return m_position;
+}
+
 //~ Setters
 void Rig::set_position(const glm::vec3 position)
 {

@@ -17,6 +17,10 @@ class Camera
 		glm::mat4 get_view_matrix() const;
 		glm::mat4 get_projection_matrix() const;
 		glm::vec3 get_position() const;
+		float get_fov() const;
+		float get_ratio() const;
+		float get_near() const;
+		float get_far() const;
 		
 		void set_position(const glm::vec3 position);
 		void set_target(const glm::vec3 target);

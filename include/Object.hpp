@@ -13,6 +13,7 @@
 class Object
 {
 	public:
+		Object(const char* filename);
 		Object(const char* filename, const char* texture_path);
 		~Object();
 		
@@ -20,6 +21,7 @@ class Object
 		void load_textures();
 		
 		GLuint get_diffuse_texture() const;
+		const char* get_texture_path() const;
 		unsigned int get_size() const;
 		GLuint get_vao() const;
 		glm::mat4 get_model_matrix() const;

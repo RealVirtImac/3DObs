@@ -23,6 +23,8 @@ class Rig
 		void update_vertical_angle(const int mouse_y);
 		void update_target();
 		
+		glm::vec3 get_position() const;
+		
 	private:
 		Camera* m_camera_one;
 		Camera* m_camera_two;

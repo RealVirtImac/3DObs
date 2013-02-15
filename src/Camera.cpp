@@ -4,7 +4,7 @@ Camera::Camera(int width, int height, int type):
 	m_type(type),
 	m_fov(45.0f),
 	m_ratio((float)width/(float)height),
-	m_near(1.0f),
+	m_near(0.5f),
 	m_far(100.0f),
 	m_horizontal_angle(M_PI),
 	m_vertical_angle(0.0f),
@@ -81,6 +81,26 @@ glm::mat4 Camera::get_projection_matrix() const
 glm::vec3 Camera::get_position() const
 {
 	return m_position;
+}
+
+float Camera::get_fov() const
+{
+	return m_fov;
+}
+
+float Camera::get_ratio() const
+{
+	return m_ratio;
+}
+
+float Camera::get_near() const
+{
+	return m_near;
+}
+
+float Camera::get_far() const
+{
+	return m_far;
 }
 
 //~ Setters

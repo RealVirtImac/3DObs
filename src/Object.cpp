@@ -1,5 +1,16 @@
 #include "../include/Object.hpp"
 
+Object::Object(const char* filename)
+{
+	//~ Loading OBJ
+	load_OBJ(filename, m_vertices, m_uvs, m_normals);
+	//~ Initializing model matrix
+	m_model_matrix = glm::mat4(1.0);
+	//~ Creating buffers
+	create_buffers();
+	m_texture_path = NULL;
+}
+
 Object::Object(const char* filename, const char* texture_path)
 {
 	//~ Loading OBJ
@@ -9,11 +20,8 @@ Object::Object(const char* filename, const char* texture_path)
 	//~ Creating buffers
 	create_buffers();
 	//~ Load texture
-	if(texture_path != NULL)
-	{
-		m_texture_path = texture_path;
-		load_textures();
-	}
+	m_texture_path = texture_path;
+	load_textures();
 }
 
 Object::~Object()
@@ -118,4 +126,9 @@ glm::mat4 Object::get_model_matrix() const
 GLuint Object::get_diffuse_texture() const
 {
 	return m_diffuse_texture;
+}
+
+const char* Object::get_texture_path() const
+{
+	return m_texture_path;
 }
