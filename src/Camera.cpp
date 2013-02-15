@@ -29,10 +29,8 @@ void Camera::compute_view_matrix()
 
 void Camera::compute_projection_matrix()
 {
-	//CONST TPS
 	float dc = 2.0;
 	float dioc = 0.065;
-	//!CONST TPS
 
 	//Frustum (left camera)
 	if (m_type == 1)

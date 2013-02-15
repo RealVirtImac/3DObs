@@ -23,11 +23,8 @@ class Renderer
 		Rig* get_rig() const;
 		Camera* get_camera_one() const;
 		Camera* get_camera_two() const;
-		void switch_drawing_mode();
 		
 	private:
-		bool m_drawing_mode;
-	
 		int m_width;
 		int m_height;
 	

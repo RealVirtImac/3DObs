@@ -1,17 +1,16 @@
 #include "../include/Renderer.hpp"
 
-Renderer::Renderer(int width, int height):m_drawing_mode(false)
+Renderer::Renderer(int width, int height):
+	m_width(width),
+	m_height(height)
 {
 	GLenum error;
 	if((error = glewInit()) != GLEW_OK) {
 		throw std::runtime_error((const char*)glewGetErrorString(error));
 	}
-	//~ Settings dimensions
-	m_width = width;
-	m_height = height;
 	//~ Loading object
-	m_object = new Object("models/cube_map.obj","textures/cube_map_tex.bmp");
-	m_object->set_model_matrix(glm::scale(glm::mat4(1.0),glm::vec3(0.025f,0.025f,0.025f)));
+	m_object = new Object("models/mothership.obj","textures/stargate.bmp");
+	m_object->set_model_matrix(glm::scale(glm::mat4(1.0),glm::vec3(0.25f,0.25f,0.25f)));
 	//~ Loading quad
 	m_quad = new Object("models/quad.obj",NULL);
 	//~ Compiling shaders
@@ -167,13 +166,8 @@ void Renderer::render()
 	//~ Binding vao
 	glBindVertexArray(m_object->get_vao());
 	//~ Drawing
-	switch(m_drawing_mode)
-	{
-		case false : glDrawArrays(GL_TRIANGLES, 0, m_object->get_size());
-		break;
-		case true : glDrawArrays(GL_LINE_LOOP, 0, m_object->get_size());
-		break;
-	}
+	glDrawArrays(GL_TRIANGLES, 0, m_object->get_size());
+
 	//~ Unbind
 	glBindVertexArray(0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -207,13 +201,8 @@ void Renderer::render()
 	//~ Binding vao
 	glBindVertexArray(m_object->get_vao());
 	//~ Drawing
-	switch(m_drawing_mode)
-	{
-		case false : glDrawArrays(GL_TRIANGLES, 0, m_object->get_size());
-		break;
-		case true : glDrawArrays(GL_LINE_LOOP, 0, m_object->get_size());
-		break;
-	}
+	glDrawArrays(GL_TRIANGLES, 0, m_object->get_size());
+
 	//~ Unbind
 	glBindVertexArray(0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -241,13 +230,7 @@ void Renderer::render()
 	//~ //Binding vao
 	glBindVertexArray(m_quad->get_vao());
 	//~ //Drawing
-	switch(m_drawing_mode)
-	{
-		case false : glDrawArrays(GL_TRIANGLES, 0, m_quad->get_size());
-		break;
-		case true : glDrawArrays(GL_LINE_LOOP, 0, m_quad->get_size());
-		break;
-	}
+	glDrawArrays(GL_TRIANGLES, 0, m_quad->get_size());
 	//~ //Unbind
 	glBindVertexArray(0);
 }
@@ -369,9 +352,4 @@ Camera* Renderer::get_camera_one() const
 Camera* Renderer::get_camera_two() const
 {
 	return m_camera_two;
-}
-
-void Renderer::switch_drawing_mode()
-{
-	m_drawing_mode = !m_drawing_mode;
 }

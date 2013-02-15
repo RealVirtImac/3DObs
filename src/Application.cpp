@@ -98,9 +98,6 @@ void Application::on_event(SDL_Event* Event)
 			//~ Right
 			case SDLK_d : 	m_renderer->get_rig()->update_position(3);
 			break;
-			//~ Wireframe
-			case SDLK_w : m_renderer->switch_drawing_mode();
-			break;
 			default : ;
 			break;
 		}

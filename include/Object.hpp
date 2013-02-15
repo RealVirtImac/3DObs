@@ -1,5 +1,12 @@
 #pragma once
 
+//!  Object that can be instanced in the scene
+/*!
+  * \author R. Bertozzi & S. Bougeois
+  * \brief Object that can be instanced in the scene
+  * \file Object.hpp
+*/
+
 #include <GL/glew.h>
 #include <vector>
 #include <iostream>
@@ -13,19 +20,52 @@
 class Object
 {
 	public:
+		//! Constructor without texture
+		/*!
+		 *	\param filename Path of the obj model to load
+		 */
 		Object(const char* filename);
+		//! Constructor with texture
+		/*!
+		 *	\param filename Path of the obj model to load
+		 *	\param texture_path Path of the texture to load
+		 */
 		Object(const char* filename, const char* texture_path);
+		//! Destuctor
 		~Object();
 		
+		//! Creates all the required buffers for the objects (vertices, normals, uvs) and the associated VAO
 		void create_buffers();
+		//! Loads the textures thanks to SDL_LoadBMP
 		void load_textures();
 		
+		//! Gets the identifier of the diffuse texture
+		/*!
+		 * \return The identifier of the diffuse texture
+		 */ 
 		GLuint get_diffuse_texture() const;
+		//! Gets the path of the diffuse texture
+		/*!
+		 * \return The path of the diffuse texture
+		 */ 
 		const char* get_texture_path() const;
+		//! Gets the number of vertices in the model
+		/*!
+		 * \return The number of vertices in the model
+		 */ 
 		unsigned int get_size() const;
+		//! Gets the identifier of the VAO
+		/*!
+		 * \return The identifier of the VAO
+		 */ 
 		GLuint get_vao() const;
+		//! Gets the Model matrix
+		/*!
+		 * \return Model matrix
+		 */ 
 		glm::mat4 get_model_matrix() const;
 		
+		//! Sets the model matrix of the object
 		void set_model_matrix(const glm::mat4 input_matrix);
 		
 	private:
