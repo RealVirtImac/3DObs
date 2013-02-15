@@ -29,13 +29,15 @@ Renderer::Renderer(int width, int height):m_drawing_mode(false)
 	m_lighting_shader_camera_position = glGetUniformLocation(m_lighting_shader_program,"camera_position");
 	m_lighting_shader_diffuse_texture = glGetUniformLocation(m_lighting_shader_program, "diffuse_texture");
 	
-	m_quad_shader_texture = glGetUniformLocation(m_quad_shader, "renderedTexture");
+	m_quad_shader_texture_1 = glGetUniformLocation(m_quad_shader, "renderedTexture1");
+	m_quad_shader_texture_2 = glGetUniformLocation(m_quad_shader, "renderedTexture2");
 	
 	//~ Creating camera
 	glm::vec3 cam_one_position = glm::vec3(0.0f,0.0f,5.0f);
 	glm::vec3 cam_one_up = glm::vec3(0.0f,1.0f,0.0f);
 	glm::vec3 cam_one_target = glm::vec3(0.0f,0.0f,0.0f);
-        m_camera_one = new Camera(cam_one_position,cam_one_up,cam_one_target,m_width,m_height, 0);
+	m_camera_one = new Camera(cam_one_position,cam_one_up,cam_one_target,m_width,m_height, 0);
+	m_camera_two = new Camera(cam_one_position,cam_one_up,cam_one_target,m_width,m_height, 1);
 	
 	//Generating textures
 	glGenTextures(1, &m_left_render_texture);
@@ -55,15 +57,46 @@ Renderer::Renderer(int width, int height):m_drawing_mode(false)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	
+	glGenTextures(1, &m_right_render_texture);
+	glGenTextures(1, &m_right_depth_texture);
+	//Binding textures
+	glBindTexture(GL_TEXTURE_2D, m_right_render_texture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, m_width, m_height, 0, GL_RGBA, GL_FLOAT, 0);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); 
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	
+	glBindTexture(GL_TEXTURE_2D, m_right_depth_texture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, m_width, m_height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); 
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	
 	//~ //Generating framebuffers
-	glGenFramebuffers(1, &m_framebuffer_name);
+	glGenFramebuffers(1, &m_left_framebuffer);
 	//~ //Binding framebuffer
-	glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffer_name);
+	glBindFramebuffer(GL_FRAMEBUFFER, m_left_framebuffer);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_left_render_texture, 0);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_left_depth_texture, 0);
 	
-	m_draw_buffers[0] = GL_COLOR_ATTACHMENT0;
-	glDrawBuffers(1, m_draw_buffers);
+	m_left_draw_buffers[0] = GL_COLOR_ATTACHMENT0;
+	glDrawBuffers(1, m_left_draw_buffers);
+	
+	//~ //Unbind
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	
+	//~ //Generating framebuffers
+	glGenFramebuffers(1, &m_right_framebuffer);
+	//~ //Binding framebuffer
+	glBindFramebuffer(GL_FRAMEBUFFER, m_right_framebuffer);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_right_render_texture, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_right_depth_texture, 0);
+	
+	m_right_draw_buffers[0] = GL_COLOR_ATTACHMENT0;
+	glDrawBuffers(1, m_right_draw_buffers);
 	
 	//~ //Unbind
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -79,11 +112,16 @@ Renderer::~Renderer()
 {
 	glDeleteTextures(1, &m_left_render_texture);
 	glDeleteTextures(1, &m_left_depth_texture);
-	glDeleteFramebuffers(1, &m_framebuffer_name);
+	glDeleteFramebuffers(1, &m_left_framebuffer);
+	
+	glDeleteTextures(1, &m_right_render_texture);
+	glDeleteTextures(1, &m_right_depth_texture);
+	glDeleteFramebuffers(1, &m_right_framebuffer);
 	
 	delete m_object;
 	delete m_quad;
 	delete m_camera_one;
+	delete m_camera_two;
 }
 
 void Renderer::render()
@@ -91,8 +129,8 @@ void Renderer::render()
 	glClearColor(0.0,0.0,0.0,1.0);
 	glEnable(GL_DEPTH_TEST);
 	//~ 
-	glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffer_name);
-	glDrawBuffers(1, m_draw_buffers);
+	glBindFramebuffer(GL_FRAMEBUFFER, m_left_framebuffer);
+	glDrawBuffers(1, m_left_draw_buffers);
 	glClearColor(0.0,0.0,0.0,1.0);
 	glViewport(0, 0, m_width, m_height);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -120,6 +158,35 @@ void Renderer::render()
 	glBindVertexArray(0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	
+	glBindFramebuffer(GL_FRAMEBUFFER, m_right_framebuffer);
+	glDrawBuffers(1, m_right_draw_buffers);
+	glClearColor(0.0,0.0,0.0,1.0);
+	glViewport(0, 0, m_width, m_height);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	//~ Choosing shader
+	glUseProgram(m_lighting_shader_program);
+	//~ Sending uniforms
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, m_object->get_diffuse_texture());
+	glUniform1i(m_lighting_shader_diffuse_texture, 0);
+	glUniformMatrix4fv(m_lighting_shader_model_matrix_position, 1, GL_FALSE, glm::value_ptr(m_object->get_model_matrix()));
+	glUniformMatrix4fv(m_lighting_shader_view_matrix_position, 1, GL_FALSE, glm::value_ptr(m_camera_two->get_view_matrix()));
+	glUniformMatrix4fv(m_lighting_shader_projection_matrix_position, 1, GL_FALSE, glm::value_ptr(m_camera_two->get_projection_matrix()));
+	glUniform3fv(m_lighting_shader_camera_position, GL_FALSE, glm::value_ptr(m_camera_two->get_position()));
+	//~ Binding vao
+	glBindVertexArray(m_object->get_vao());
+	//~ Drawing
+	switch(m_drawing_mode)
+	{
+		case false : glDrawArrays(GL_TRIANGLES, 0, m_object->get_size());
+		break;
+		case true : glDrawArrays(GL_LINE_LOOP, 0, m_object->get_size());
+		break;
+	}
+	//~ Unbind
+	glBindVertexArray(0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	
 	glClearColor(0.0,0.0,0.0,1.0);
 	glViewport(0, 0, m_width, m_height);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -128,11 +195,14 @@ void Renderer::render()
 	//~ //Sending uniforms
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, m_left_render_texture);
-	glUniform1i(m_lighting_shader_diffuse_texture, 0);
+	glUniform1i(m_quad_shader_texture_1, 0);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, m_right_render_texture);
+	glUniform1i(m_quad_shader_texture_2, 1);
 	glUniformMatrix4fv(m_lighting_shader_model_matrix_position, 1, GL_FALSE, glm::value_ptr(m_quad->get_model_matrix()));
-	glUniformMatrix4fv(m_lighting_shader_view_matrix_position, 1, GL_FALSE, glm::value_ptr(m_camera_one->get_view_matrix()));
-	glUniformMatrix4fv(m_lighting_shader_projection_matrix_position, 1, GL_FALSE, glm::value_ptr(m_camera_one->get_projection_matrix()));
-	glUniform3fv(m_lighting_shader_camera_position, GL_FALSE, glm::value_ptr(m_camera_one->get_position()));
+	glUniformMatrix4fv(m_lighting_shader_view_matrix_position, 1, GL_FALSE, glm::value_ptr(m_camera_two->get_view_matrix()));
+	glUniformMatrix4fv(m_lighting_shader_projection_matrix_position, 1, GL_FALSE, glm::value_ptr(m_camera_two->get_projection_matrix()));
+	glUniform3fv(m_lighting_shader_camera_position, GL_FALSE, glm::value_ptr(m_camera_two->get_position()));
 	//~ //Binding vao
 	glBindVertexArray(m_quad->get_vao());
 	//~ //Drawing
@@ -254,6 +324,11 @@ GLuint Renderer::loadProgram(const char* vertexShaderFile, const char* fragmentS
 Camera* Renderer::get_camera_one() const
 {
 	return m_camera_one;
+}
+
+Camera* Renderer::get_camera_two() const
+{
+	return m_camera_two;
 }
 
 void Renderer::switch_drawing_mode()

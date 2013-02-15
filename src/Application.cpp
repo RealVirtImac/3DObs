@@ -70,6 +70,11 @@ void Application::on_loop()
 	m_renderer->get_camera_one()->update_vertical_angle(m_mouse_y);
 	m_renderer->get_camera_one()->update_target();
 	m_renderer->get_camera_one()->compute_view_matrix();
+	
+	m_renderer->get_camera_two()->update_horizontal_angle(m_mouse_x);
+	m_renderer->get_camera_two()->update_vertical_angle(m_mouse_y);
+	m_renderer->get_camera_two()->update_target();
+	m_renderer->get_camera_two()->compute_view_matrix();
 }
 
 void Application::on_event(SDL_Event* Event)
@@ -85,16 +90,20 @@ void Application::on_event(SDL_Event* Event)
 			case SDLK_ESCAPE: m_running = false;
 			break;
 			//~ Forward
-			case SDLK_z : m_renderer->get_camera_one()->update_position(1);
+			case SDLK_z : 	
+							
 			break;
 			//~ Backward
-			case SDLK_s : m_renderer->get_camera_one()->update_position(0);
+			case SDLK_s : 	
+							
 			break;
 			//~ Left
-			case SDLK_q : m_renderer->get_camera_one()->update_position(2);
+			case SDLK_q : 	
+							
 			break;
 			//~ Right
-			case SDLK_d : m_renderer->get_camera_one()->update_position(3);
+			case SDLK_d : 	
+							
 			break;
 			//~ Wireframe
 			case SDLK_w : m_renderer->switch_drawing_mode();
