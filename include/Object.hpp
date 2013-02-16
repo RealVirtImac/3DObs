@@ -17,6 +17,9 @@
 #include "glm/gtc/type_ptr.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
+/*!
+ * \brief Object that can be instanced in the scene
+ */ 
 class Object
 {
 	public:

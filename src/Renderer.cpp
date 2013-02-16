@@ -1,3 +1,9 @@
+/*!
+ * \file Renderer.cpp
+ * \brief Renderer of the context
+ * \author R. Bertozzi & S. Bougeois 
+ */
+
 #include "../include/Renderer.hpp"
 
 Renderer::Renderer(int width, int height):

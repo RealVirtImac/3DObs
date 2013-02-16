@@ -1,3 +1,9 @@
+/*!
+ * \file Application.cpp
+ * \brief Creates the context of the program
+ * \author R. Bertozzi & S. Bougeois 
+ */
+
 #include "../include/Application.hpp"
 
 Application::Application():m_running(true), m_display(NULL)

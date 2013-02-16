@@ -1,3 +1,9 @@
+/*!
+ * \file Rig.cpp
+ * \brief The rig that maintains the cameras in a single entity
+ * \author R. Bertozzi & S. Bougeois 
+ */
+
 #include "../include/Rig.hpp"
 
 Rig::Rig(Camera* camera_one, Camera* camera_two, glm::vec3 position, glm::vec3 up, glm::vec3 target, int width, int height):
@@ -30,9 +36,9 @@ Rig::~Rig()
 {
 }
 
-void Rig::update_position(const int up_down)
+void Rig::update_position(const int direction)
 {
-	switch(up_down)
+	switch(direction)
 	{
 		//~ Forward
 		case 0 : 	m_position -= m_target * m_speed;

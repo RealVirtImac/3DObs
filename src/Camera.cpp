@@ -1,3 +1,9 @@
+/*!
+ * \file Camera.cpp
+ * \brief Camera that is viewing the scene
+ * \author R. Bertozzi & S. Bougeois 
+ */
+
 #include "../include/Camera.hpp"
 
 Camera::Camera(int width, int height, int type):

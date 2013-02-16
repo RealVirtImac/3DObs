@@ -14,6 +14,9 @@
 
 #include "Renderer.hpp"
 
+/*!
+ * \brief Contains the main skeleton of the program, from the initialization of the SDL context to its deletion.
+ */ 
 class Application
 {
 	public:

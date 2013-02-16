@@ -1,5 +1,12 @@
 #pragma once
 
+//!  Renderer of the context
+/*!
+  * \author R. Bertozzi & S. Bougeois
+  * \brief Renderer of the context
+  * \file Renderer.hpp
+*/
+
 #include <GL/glew.h>
 #include <stdexcept>
 #include <iostream>
@@ -12,16 +19,39 @@
 #include "Camera.hpp"
 #include "Rig.hpp"
 
+/*!
+ * \brief Renderer of the context
+ */ 
 class Renderer
 {
 	public:
+		//! Constructor
+		/*!
+		 * Initializes several elements such as GLEW, the object, the quad, the shaders, the framebuffers...
+		 * \param width Width of the window
+		 * \param height Height of the window
+		 */ 
 		Renderer(int width, int height);
+		//! Destructor
 		~Renderer();
 		
+		//! Render the scene thanks to the two cameras and the framebuffers
 		void render();
 		
+		//! Gets the rig maintaining the two cameras
+		/*!
+		 * \return The rig
+		 */ 
 		Rig* get_rig() const;
+		//! Gets the first camera
+		/*!
+		 * \return The first camera
+		 */ 
 		Camera* get_camera_one() const;
+		//! Gets the second camera
+		/*!
+		 * \return The second camera
+		 */ 
 		Camera* get_camera_two() const;
 		
 	private:

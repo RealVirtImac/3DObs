@@ -1,3 +1,9 @@
+/*!
+ * \file Object.cpp
+ * \brief Object that can be instanced in the scene
+ * \author R. Bertozzi & S. Bougeois 
+ */
+
 #include "../include/Object.hpp"
 
 Object::Object(const char* filename)

@@ -13,6 +13,9 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
+/*!
+ * \brief Camera that is viewing the scene
+ */ 
 class Camera
 {
 	public:
