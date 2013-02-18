@@ -6,7 +6,10 @@
 
 #include "../include/Application.hpp"
 
-Application::Application():m_running(true), m_display(NULL)
+Application::Application():
+	m_running(true),
+	m_display(NULL),
+	m_joystick(NULL)
 {
 }
 
@@ -25,6 +28,23 @@ bool Application::on_init()
 	
 	m_width = 1280;
 	m_height = 720;
+
+	for(int i = 0; i < 4; ++i)
+	{
+		m_input_keys.push_back(false);
+	}
+
+	int numJoystick = SDL_NumJoysticks();
+	if (numJoystick >= 1)
+	{
+		m_joystick = SDL_JoystickOpen(0);
+		std::cout << SDL_JoystickName(0) << std::endl;
+		SDL_JoystickEventState(SDL_ENABLE);
+	}
+	else
+	{
+		std::cout << "There is no joystick" << std::endl;
+	}
 	
 	if((m_display = SDL_SetVideoMode(m_width,m_height,32, SDL_HWSURFACE|SDL_DOUBLEBUF|SDL_OPENGL)) == NULL)
 	{
@@ -38,7 +58,7 @@ bool Application::on_init()
 	SDL_GetMouseState(&m_mouse_x,&m_mouse_y);
 	SDL_ShowCursor(SDL_DISABLE); 
 	
-	SDL_EnableKeyRepeat(40, 10);
+	SDL_EnableKeyRepeat(10, 10);
 	return true;
 }
 
@@ -71,7 +91,34 @@ void Application::on_loop()
 {
 	SDL_WarpMouse(m_width/2, m_height/2);
 	SDL_GetMouseState(&m_mouse_x,&m_mouse_y);
+
+	for(unsigned int i = 0; i < m_input_keys.size(); ++i)
+	{
+		if(m_input_keys.at(i))
+		{
+			m_renderer->get_rig()->update_position(i);
+		}
+	}
 	
+	if(m_joystick != NULL)
+	{
+		int epsilon = 4000;
+		//~ Forward / Backward
+		if(SDL_JoystickGetAxis(m_joystick, 1) > epsilon) m_renderer->get_rig()->update_position(0);
+		if(SDL_JoystickGetAxis(m_joystick, 1) < -epsilon) m_renderer->get_rig()->update_position(1);
+		//~ Left / Right
+		if(SDL_JoystickGetAxis(m_joystick, 0) < -epsilon) m_renderer->get_rig()->update_position(2);
+		if(SDL_JoystickGetAxis(m_joystick, 0) > epsilon) m_renderer->get_rig()->update_position(3);
+		
+		int delta = 10;
+		//~ Eyes to the left / Right
+		if(SDL_JoystickGetAxis(m_joystick, 2) < -epsilon) m_mouse_x -= delta;
+		if(SDL_JoystickGetAxis(m_joystick, 2) > epsilon) m_mouse_x += delta;
+		//~ Eyes to the ground / sky
+		if(SDL_JoystickGetAxis(m_joystick, 3) < -epsilon) m_mouse_y -= delta;
+		if(SDL_JoystickGetAxis(m_joystick, 3) > epsilon) m_mouse_y += delta;
+	}
+
 	m_renderer->get_rig()->update_horizontal_angle(m_mouse_x);
 	m_renderer->get_rig()->update_vertical_angle(m_mouse_y);
 	m_renderer->get_rig()->update_target();
@@ -93,16 +140,38 @@ void Application::on_event(SDL_Event* Event)
 			case SDLK_ESCAPE: m_running = false;
 			break;
 			//~ Forward
-			case SDLK_z :	m_renderer->get_rig()->update_position(1);
+			case SDLK_z :	m_input_keys.at(1) = true;
 			break;
 			//~ Backward
-			case SDLK_s : 	m_renderer->get_rig()->update_position(0);
+			case SDLK_s : 	m_input_keys.at(0) = true;
 			break;
 			//~ Left
-			case SDLK_q : 	m_renderer->get_rig()->update_position(2);
+			case SDLK_q : 	m_input_keys.at(2) = true;
 			break;
 			//~ Right
-			case SDLK_d : 	m_renderer->get_rig()->update_position(3);
+			case SDLK_d : 	m_input_keys.at(3) = true;
+			break;
+			default : ;
+			break;
+		}
+	}
+	if(Event->type == SDL_KEYUP)
+	{
+		switch(Event->key.keysym.sym)
+		{
+			case SDLK_ESCAPE: m_running = false;
+			break;
+			//~ Forward
+			case SDLK_z :	m_input_keys.at(1) = false;
+			break;
+			//~ Backward
+			case SDLK_s : 	m_input_keys.at(0) = false;
+			break;
+			//~ Left
+			case SDLK_q : 	m_input_keys.at(2) = false;
+			break;
+			//~ Right
+			case SDLK_d : 	m_input_keys.at(3) = false;
 			break;
 			default : ;
 			break;
@@ -120,6 +189,7 @@ void Application::on_render()
 void Application::on_cleanup()
 {
 	delete m_renderer;
+	if(m_joystick != NULL) SDL_JoystickClose(m_joystick);
 	SDL_FreeSurface(m_display);
 	SDL_Quit();
 }

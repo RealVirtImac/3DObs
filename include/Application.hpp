@@ -11,6 +11,8 @@
 
 #include <GL/glew.h>
 #include <SDL/SDL.h>
+#include <SDL/SDL_getenv.h>
+#include <vector>
 
 #include "Renderer.hpp"
 
@@ -59,4 +61,8 @@ class Application
 		
 		int m_width;
 		int m_height;
+		
+		SDL_Joystick* m_joystick;
+		
+		std::vector<bool> m_input_keys;
 };
