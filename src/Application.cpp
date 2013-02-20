@@ -197,6 +197,10 @@ void Application::on_event(SDL_Event* Event)
 		{
 			m_renderer->reset_cameras_dioc();
 		}
+		if((int)Event->jbutton.button == 7)
+		{
+			m_running = false;
+		}
 	}
 	if(Event->type == SDL_JOYHATMOTION)
 	{
