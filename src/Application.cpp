@@ -151,6 +151,8 @@ void Application::on_event(SDL_Event* Event)
 			//~ Right
 			case SDLK_d : 	m_input_keys.at(3) = true;
 			break;
+			case SDLK_o : m_renderer->reset_cameras_dioc();
+			break;
 			default : ;
 			break;
 		}
@@ -175,6 +177,38 @@ void Application::on_event(SDL_Event* Event)
 			break;
 			default : ;
 			break;
+		}
+	}
+	if(Event->type == SDL_MOUSEBUTTONDOWN)
+	{
+		float delta = 0.01;
+		if (Event->button.button == SDL_BUTTON_WHEELUP)
+		{
+			m_renderer->set_cameras_dioc(delta);
+		}
+		if (Event->button.button == SDL_BUTTON_WHEELDOWN)
+		{
+			m_renderer->set_cameras_dioc(-delta);
+		}
+	}
+	if(Event->type == SDL_JOYBUTTONDOWN)
+	{
+		if((int)Event->jbutton.button == 0)
+		{
+			m_renderer->reset_cameras_dioc();
+		}
+	}
+	if(Event->type == SDL_JOYHATMOTION)
+	{
+		float delta = 0.01;
+		if(Event->jhat.value == SDL_HAT_UP)
+		{
+			m_renderer->set_cameras_dioc(delta);
+			
+		}
+		if(Event->jhat.value == SDL_HAT_DOWN)
+		{
+			m_renderer->set_cameras_dioc(-delta);
 		}
 	}
 }

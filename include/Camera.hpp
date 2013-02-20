@@ -69,6 +69,7 @@ class Camera
 		 * \return Far of the camera
 		 */
 		float get_far() const;
+		float get_dioc() const;
 		
 		//! Sets the position of the camera
 		/*!
@@ -89,13 +90,17 @@ class Camera
 		/*!
 		 * \param angle
 		 */
-		void set_horizontal_angle(float angle);
+		void set_horizontal_angle(const float angle);
 		//! Sets the vertical angle of the camera
 		/*!
 		 * \param angle
 		 */
-		void set_vertical_angle(float angle);
-	
+		void set_vertical_angle(const float angle);
+		//! Sets the dioc of the camera
+		/*!
+		 * \param dioc The new DIOC
+		 */
+		void set_dioc(const float dioc);
 	private:
 		//! Specifies if the camera is the left (1) or the right(0) one
 		int m_type;
@@ -119,4 +124,6 @@ class Camera
 		
 		int m_width;
 		int m_height;
+		
+		float m_dioc;
 };

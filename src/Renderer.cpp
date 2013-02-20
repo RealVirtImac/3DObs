@@ -15,8 +15,9 @@ Renderer::Renderer(int width, int height):
 		throw std::runtime_error((const char*)glewGetErrorString(error));
 	}
 	//~ Loading object
-	m_object = new Object("models/stargate.obj","textures/stargate.bmp");
-	m_object->set_model_matrix(glm::scale(glm::mat4(1.0),glm::vec3(0.05f,0.05f,0.05f)));
+	m_object = new Object("models/dna2.obj","textures/stargate.bmp");
+	m_object->set_model_matrix(glm::scale(glm::mat4(1.0f),glm::vec3(0.5f,0.5f,0.5f)));
+	m_object->set_model_matrix(glm::translate(m_object->get_model_matrix(),glm::vec3(-1.0f,0.00f,0.00f)));
 	//~ Loading quad
 	m_quad = new Object("models/quad.obj",NULL);
 	//~ Compiling shaders
@@ -358,4 +359,24 @@ Camera* Renderer::get_camera_one() const
 Camera* Renderer::get_camera_two() const
 {
 	return m_camera_two;
+}
+
+void Renderer::reset_cameras_dioc()
+{
+	m_camera_one->set_dioc(0.065);
+	m_camera_two->set_dioc(0.065);
+	
+	m_camera_one->compute_projection_matrix();
+	m_camera_two->compute_projection_matrix();
+}
+
+void Renderer::set_cameras_dioc(const float delta)
+{
+	float dioc = m_camera_one->get_dioc();
+	m_camera_one->set_dioc(dioc + delta);
+	dioc = m_camera_two->get_dioc();
+	m_camera_two->set_dioc(dioc + delta);
+	
+	m_camera_one->compute_projection_matrix();
+	m_camera_two->compute_projection_matrix();
 }
