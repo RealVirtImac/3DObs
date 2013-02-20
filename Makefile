@@ -3,35 +3,55 @@ CFLAGS = -W -Wall -ansi
 LDFLAGS = -lSDL -lGL -lGLEW
 EXEC = 3DObs
 
-all: $(EXEC)
+all:	$(EXEC)
+	
 
-$(EXEC): Application.o Object.o Renderer.o Camera.o ObjLoader.o Rig.o main.o
-	$(CXX) -o $(EXEC) Application.o Object.o Renderer.o Camera.o ObjLoader.o Rig.o main.o $(CFLAGS) $(LDFLAGS)
-	rm -rf *.o
+$(EXEC): bin/Application.o bin/Object.o bin/Renderer.o bin/Camera.o bin/ObjLoader.o bin/Rig.o bin/main.o
+	@echo "\033[33;33m \t Linking \033[m\017" 
+	@$(CXX) -o $(EXEC) bin/Application.o bin/Object.o bin/Renderer.o bin/Camera.o bin/ObjLoader.o bin/Rig.o bin/main.o $(CFLAGS) $(LDFLAGS)
+	@echo "\033[33;34m \t Done : type : ./3DObs to run \033[m\017"
 
-ObjLoader.o: src/ObjLoader.cpp include/ObjLoader.hpp
-	$(CXX) -c src/ObjLoader.cpp $(CFLAGS)
+bin/Application.o: src/Application.cpp include/Application.hpp
+	@echo ""
+	@echo "------------------- 3DObs --------------------"
+	@echo "\033[33;32m \t Compiling" $< "\033[m\017" 
+	@$(CXX) -c src/Application.cpp $(CFLAGS)
+	@mv Application.o bin/
 
-Camera.o: src/Camera.cpp include/Camera.hpp
-	$(CXX) -c src/Camera.cpp $(CFLAGS)
+bin/ObjLoader.o: src/ObjLoader.cpp include/ObjLoader.hpp
+	@echo "\033[33;32m \t Compiling" $< "\033[m\017" 
+	@$(CXX) -c src/ObjLoader.cpp $(CFLAGS)
+	@mv ObjLoader.o bin/
 
-Object.o: src/Object.cpp include/Object.hpp
-	$(CXX) -c src/Object.cpp $(CFLAGS)
+bin/Camera.o: src/Camera.cpp include/Camera.hpp
+	@echo "\033[33;32m \t Compiling" $< "\033[m\017" 
+	@$(CXX) -c src/Camera.cpp $(CFLAGS)
+	@mv Camera.o bin/
 
-Renderer.o: src/Renderer.cpp include/Renderer.hpp
-	$(CXX) -c src/Renderer.cpp $(CFLAGS)
+bin/Object.o: src/Object.cpp include/Object.hpp
+	@echo "\033[33;32m \t Compiling" $< "\033[m\017" 
+	@$(CXX) -c src/Object.cpp $(CFLAGS)
+	@mv Object.o bin/
 
-Rig.o: src/Rig.cpp include/Rig.hpp
-	$(CXX) -c src/Rig.cpp $(CFLAGS)
+bin/Renderer.o: src/Renderer.cpp include/Renderer.hpp
+	@echo "\033[33;32m \t Compiling" $< "\033[m\017" 
+	@$(CXX) -c src/Renderer.cpp $(CFLAGS)
+	@mv Renderer.o bin/
 
-Application.o: src/Application.cpp include/Application.hpp
-	$(CXX) -c src/Application.cpp $(CFLAGS)
+bin/Rig.o: src/Rig.cpp include/Rig.hpp
+	@echo "\033[33;32m \t Compiling" $< "\033[m\017" 
+	@$(CXX) -c src/Rig.cpp $(CFLAGS)
+	@mv Rig.o bin/
 
-main.o: src/main.cpp
-	$(CXX) -c src/main.cpp $(CFLAGS)
+bin/main.o: src/main.cpp
+	@echo "\033[33;32m \t Compiling" $< "\033[m\017" 
+	@$(CXX) -c src/main.cpp $(CFLAGS)
+	@mv main.o bin/
 
 clean:
-	rm -rf *.o
+	@rm -rf bin/*.o
+	@echo "\033[33;31m \t Cleaning '.o' \033[m\017" 
 
 mrproper: clean
-	rm -rf $(EXEC)
+	@rm -rf $(EXEC)
+	@echo "\033[33;31m \t Cleaning the executable \033[m\017" 

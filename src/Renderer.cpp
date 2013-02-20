@@ -15,8 +15,8 @@ Renderer::Renderer(int width, int height):
 		throw std::runtime_error((const char*)glewGetErrorString(error));
 	}
 	//~ Loading object
-	m_object = new Object("models/mothership.obj","textures/stargate.bmp");
-	m_object->set_model_matrix(glm::scale(glm::mat4(1.0),glm::vec3(0.25f,0.25f,0.25f)));
+	m_object = new Object("models/stargate.obj","textures/stargate.bmp");
+	m_object->set_model_matrix(glm::scale(glm::mat4(1.0),glm::vec3(0.05f,0.05f,0.05f)));
 	//~ Loading quad
 	m_quad = new Object("models/quad.obj",NULL);
 	//~ Compiling shaders
