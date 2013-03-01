@@ -31,7 +31,7 @@ class Rig
 		 * \param width The width of the window
 		 * \param height The height of the window
 		 */ 
-		Rig(Camera* camera_one, Camera* camera_two, glm::vec3 position, glm::vec3 up, glm::vec3 target, int width, int height);
+                Rig(Camera* camera_one, Camera* camera_two, glm::vec3 position, float dioc, glm::vec3 up, glm::vec3 target, int width, int height);
 		//! Destructor
 		~Rig();
 		

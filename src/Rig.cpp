@@ -6,7 +6,7 @@
 
 #include "../include/Rig.hpp"
 
-Rig::Rig(Camera* camera_one, Camera* camera_two, glm::vec3 position, glm::vec3 up, glm::vec3 target, int width, int height):
+Rig::Rig(Camera* camera_one, Camera* camera_two, glm::vec3 position, float dioc, glm::vec3 up, glm::vec3 target, int width, int height):
 	m_camera_one(camera_one),
 	m_camera_two(camera_two),
 	m_position(position),
@@ -19,18 +19,28 @@ Rig::Rig(Camera* camera_one, Camera* camera_two, glm::vec3 position, glm::vec3 u
 	m_width(width),
 	m_height(height)
 {
-	m_camera_one->set_position(m_position);
-	m_camera_two->set_position(m_position);
-	
+        m_camera_one->set_dioc(dioc);
+        m_camera_two->set_dioc(dioc);
+
+
+        m_camera_one->set_position(glm::vec3(m_position.x - dioc/2, m_position.y, m_position.z));
+        m_camera_two->set_position(glm::vec3(m_position.x + dioc/2, m_position.y, m_position.z));
+        std::cout<<m_camera_one->get_position().x<<std::endl;
+        std::cout<<m_camera_two->get_position().x<<std::endl;
+
 	m_camera_one->set_target(m_target);
 	m_camera_two->set_target(m_target);
 	
 	m_camera_one->set_up(m_up);
 	m_camera_two->set_up(m_up);
 	
-	m_camera_one->compute_view_matrix();
-	m_camera_two->compute_view_matrix();
+        m_camera_one->compute_view_matrix();
+        m_camera_two->compute_view_matrix();
+
+        m_camera_one->compute_projection_matrix();
+        m_camera_two->compute_projection_matrix();
 }
+
 
 Rig::~Rig()
 {
