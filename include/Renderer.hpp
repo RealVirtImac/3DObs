@@ -54,14 +54,6 @@ class Renderer
 		 */ 
 		Camera* get_camera_two() const;
 		
-		//! Resets the cameras DIOC
-		void reset_cameras_dioc();
-		//! Set the cameras DIOC
-		/*!
-		 * \param delta The value of the iteration. Can be positive or negative
-		 */ 
-		void set_cameras_dioc(const float delta);
-		
 	private:
 		int m_width;
 		int m_height;

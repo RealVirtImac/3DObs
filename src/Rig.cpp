@@ -19,26 +19,20 @@ Rig::Rig(Camera* camera_one, Camera* camera_two, glm::vec3 position, float dioc,
 	m_width(width),
 	m_height(height)
 {
-        m_camera_one->set_dioc(dioc);
-        m_camera_two->set_dioc(dioc);
-
-
-        m_camera_one->set_position(glm::vec3(m_position.x - dioc/2, m_position.y, m_position.z));
-        m_camera_two->set_position(glm::vec3(m_position.x + dioc/2, m_position.y, m_position.z));
-        std::cout<<m_camera_one->get_position().x<<std::endl;
-        std::cout<<m_camera_two->get_position().x<<std::endl;
+	m_camera_one->set_dioc(dioc);
+	m_camera_two->set_dioc(dioc);
 
 	m_camera_one->set_target(m_target);
 	m_camera_two->set_target(m_target);
 	
 	m_camera_one->set_up(m_up);
 	m_camera_two->set_up(m_up);
-	
-        m_camera_one->compute_view_matrix();
-        m_camera_two->compute_view_matrix();
 
-        m_camera_one->compute_projection_matrix();
-        m_camera_two->compute_projection_matrix();
+	m_camera_one->compute_projection_matrix();
+	m_camera_two->compute_projection_matrix();
+
+	m_camera_one->set_position(m_position);
+	m_camera_two->set_position(m_position);
 }
 
 
@@ -48,34 +42,65 @@ Rig::~Rig()
 
 void Rig::update_position(const int direction)
 {
+	glm::vec3 orthogonal_vector = glm::normalize(glm::cross(m_up,m_target));
+	glm::vec3 displacement = glm::vec3(0.0,0.0,0.0);
+	
 	switch(direction)
 	{
-		//~ Forward
-		case 0 : 	m_position -= m_target * m_speed;
-					m_camera_one->set_position(m_position);
-					m_camera_two->set_position(m_position);
-		break;
 		//~ Backward
+		case 0 : 	m_position -= m_target * m_speed;
+					displacement = (m_camera_one->get_dioc()/2)*orthogonal_vector;
+					
+					m_camera_one->set_position(m_position - displacement);
+					m_camera_two->set_position(m_position + displacement);
+		break;
+		//~ Forward
 		case 1 : 	m_position += m_target * m_speed;
-					m_camera_one->set_position(m_position);
-					m_camera_two->set_position(m_position);
+					displacement = (m_camera_one->get_dioc()/2)*orthogonal_vector;
+					
+					m_camera_one->set_position(m_position - displacement);
+					m_camera_two->set_position(m_position + displacement);
 		break;
 		//~ Left
 		case 2 :	{
 						glm::vec3 right = glm::vec3(sin(m_horizontal_angle - M_PI/2.0f), 0, cos(m_horizontal_angle - M_PI/2.0f));
-						m_right = right;
+						m_right = glm::normalize(right);
+
 						m_position -= right * m_speed;
-						m_camera_one->set_position(m_position);
-						m_camera_two->set_position(m_position);
+
+						glm::vec3 displacement_camera = (m_camera_one->get_dioc()/2)*orthogonal_vector;
+						
+						m_camera_one->set_position(m_position - displacement_camera);
+						m_camera_two->set_position(m_position + displacement_camera);
 					}
 		break;
 		//~ Right
 		case 3 :	{
 						glm::vec3 right = glm::vec3(sin(m_horizontal_angle - M_PI/2.0f), 0, cos(m_horizontal_angle - M_PI/2.0f));
-						m_right = right;
+						m_right = glm::normalize(right);
+
 						m_position += right * m_speed;
-						m_camera_one->set_position(m_position);
-						m_camera_two->set_position(m_position);
+
+						glm::vec3 displacement_camera = (m_camera_one->get_dioc()/2)*orthogonal_vector;
+						
+						m_camera_one->set_position(m_position - displacement_camera);
+						m_camera_two->set_position(m_position + displacement_camera);
+					}
+		break;
+		//~ Up
+		case 4 :	{
+						m_position.y += m_speed;
+						displacement = (m_camera_one->get_dioc()/2)*orthogonal_vector;
+						m_camera_one->set_position(m_position - displacement);
+						m_camera_two->set_position(m_position + displacement);
+					}
+		break;
+		//~ Down
+		case 5 :	{
+						m_position.y -= m_speed;
+						displacement = (m_camera_one->get_dioc()/2)*orthogonal_vector;
+						m_camera_one->set_position(m_position - displacement);
+						m_camera_two->set_position(m_position + displacement);
 					}
 		break;
 	}
@@ -122,4 +147,9 @@ void Rig::set_up(const glm::vec3 up)
 void Rig::set_target(const glm::vec3 target)
 {
 	m_target = target;
+}
+
+glm::vec3 Rig::get_target() const
+{
+	return m_target;
 }

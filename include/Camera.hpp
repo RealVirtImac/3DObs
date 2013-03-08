@@ -69,7 +69,26 @@ class Camera
 		 * \return Far of the camera
 		 */
 		float get_far() const;
+		//! Gets the DIOC of the camera
+		/*!
+		 * \return DIOC of the camera
+		 */
 		float get_dioc() const;
+		//! Gets the target of the camera
+		/*!
+		 * \return Target of the camera
+		 */
+		glm::vec3 get_target() const;
+		//! Gets the horizontal angle of the camera
+		/*!
+		 * \return Horizontal angle of the camera
+		 */
+		float get_horizontal_angle() const;
+		//! Gets the vertical angle of the camera
+		/*!
+		 * \return Vertical angle of the camera
+		 */
+		float get_vertical_angle() const;
 		
 		//! Sets the position of the camera
 		/*!
@@ -101,6 +120,11 @@ class Camera
 		 * \param dioc The new DIOC
 		 */
 		void set_dioc(const float dioc);
+		//! Sets the right vector of the camera
+		/*!
+		 * \param right The new right vector
+		 */
+		void set_right(const glm::vec3 right);
 	private:
 		//! Specifies if the camera is the left (1) or the right(0) one
 		int m_type;
@@ -119,8 +143,6 @@ class Camera
 		
 		float m_horizontal_angle;
 		float m_vertical_angle;
-		float m_speed;
-		float m_mouse_speed;
 		
 		int m_width;
 		int m_height;

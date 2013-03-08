@@ -13,8 +13,6 @@ $(EXEC): bin/Application.o bin/Object.o bin/Renderer.o bin/Camera.o bin/ObjLoade
 
 bin/Application.o: src/Application.cpp include/Application.hpp
 	@mkdir -p bin
-	@echo ""
-	@echo "------------------- 3DObs --------------------"
 	@echo "\033[33;32m \t Compiling" $< "\033[m\017" 
 	@$(CXX) -c src/Application.cpp $(CFLAGS)
 	@mv Application.o bin/

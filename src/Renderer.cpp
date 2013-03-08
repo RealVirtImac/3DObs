@@ -14,28 +14,28 @@ Renderer::Renderer(int width, int height):
 	if((error = glewInit()) != GLEW_OK) {
 		throw std::runtime_error((const char*)glewGetErrorString(error));
 	}
-        //~ Loading object
-        m_object = new Object("models/mothership.obj","textures/stargate.bmp");
-        m_object->set_model_matrix(glm::translate(m_object->get_model_matrix(),glm::vec3(0.00f,0.0f,-2.00f)));
-        m_object->set_model_matrix(glm::scale(m_object->get_model_matrix(),glm::vec3(0.07f,0.07f,0.07f)));
-        m_object->set_model_matrix(glm::rotate(m_object->get_model_matrix(), 45.0f, glm::vec3(1, 0, 0)));
-        //~ Loading quad
-        m_quad = new Object("models/quad.obj",NULL);
-        //~ Compiling shaders
-        m_basic_shader_program = loadProgram("shaders/basic.vertex.glsl","shaders/basic.fragment.glsl");
-        m_lighting_shader_program = loadProgram("shaders/lighting.vertex.glsl","shaders/lighting.fragment.glsl");
-        m_lighting_no_texture_shader_program = loadProgram("shaders/lighting.vertex.glsl","shaders/lighting_no_tex.fragment.glsl");
-        m_quad_shader = loadProgram("shaders/quad.vertex.glsl","shaders/quad.fragment.glsl");
-        //~ Locating uniforms
-        m_basic_shader_model_matrix_position = glGetUniformLocation(m_basic_shader_program,"model_matrix");
-        m_basic_shader_view_matrix_position = glGetUniformLocation(m_basic_shader_program,"view_matrix");
-        m_basic_shader_projection_matrix_position = glGetUniformLocation(m_basic_shader_program,"projection_matrix");
+	//~ Loading object
+	m_object = new Object("models/dna2.obj","textures/stargate.bmp");
+	m_object->set_model_matrix(glm::translate(m_object->get_model_matrix(),glm::vec3(0.00f,0.0f,-1.50f)));
+	m_object->set_model_matrix(glm::scale(m_object->get_model_matrix(),glm::vec3(0.75f,0.75f,0.75f)));
+	m_object->set_model_matrix(glm::rotate(m_object->get_model_matrix(), 0.0f, glm::vec3(1, 0, 0)));
+	//~ Loading quad
+	m_quad = new Object("models/quad.obj",NULL);
+	//~ Compiling shaders
+	m_basic_shader_program = loadProgram("shaders/basic.vertex.glsl","shaders/basic.fragment.glsl");
+	m_lighting_shader_program = loadProgram("shaders/lighting.vertex.glsl","shaders/lighting.fragment.glsl");
+	m_lighting_no_texture_shader_program = loadProgram("shaders/lighting.vertex.glsl","shaders/lighting_no_tex.fragment.glsl");
+	m_quad_shader = loadProgram("shaders/quad.vertex.glsl","shaders/quad.fragment.glsl");
+	//~ Locating uniforms
+	m_basic_shader_model_matrix_position = glGetUniformLocation(m_basic_shader_program,"model_matrix");
+	m_basic_shader_view_matrix_position = glGetUniformLocation(m_basic_shader_program,"view_matrix");
+	m_basic_shader_projection_matrix_position = glGetUniformLocation(m_basic_shader_program,"projection_matrix");
 
-        m_lighting_shader_model_matrix_position = glGetUniformLocation(m_lighting_shader_program,"model_matrix");
-        m_lighting_shader_view_matrix_position = glGetUniformLocation(m_lighting_shader_program,"view_matrix");
-        m_lighting_shader_projection_matrix_position = glGetUniformLocation(m_lighting_shader_program,"projection_matrix");
-        m_lighting_shader_camera_position = glGetUniformLocation(m_lighting_shader_program,"camera_position");
-        m_lighting_shader_diffuse_texture = glGetUniformLocation(m_lighting_shader_program, "diffuse_texture");
+	m_lighting_shader_model_matrix_position = glGetUniformLocation(m_lighting_shader_program,"model_matrix");
+	m_lighting_shader_view_matrix_position = glGetUniformLocation(m_lighting_shader_program,"view_matrix");
+	m_lighting_shader_projection_matrix_position = glGetUniformLocation(m_lighting_shader_program,"projection_matrix");
+	m_lighting_shader_camera_position = glGetUniformLocation(m_lighting_shader_program,"camera_position");
+	m_lighting_shader_diffuse_texture = glGetUniformLocation(m_lighting_shader_program, "diffuse_texture");
 	
 	m_lighting_no_texture_shader_model_matrix_position = glGetUniformLocation(m_lighting_no_texture_shader_program,"model_matrix");
 	m_lighting_no_texture_shader_view_matrix_position = glGetUniformLocation(m_lighting_no_texture_shader_program,"view_matrix");
@@ -49,11 +49,11 @@ Renderer::Renderer(int width, int height):
 	m_camera_one = new Camera(m_width,m_height, 0);
 	m_camera_two = new Camera(m_width,m_height, 1);
 	
-        glm::vec3 rig_position = glm::vec3(0.0f,0.0f,2.0f);
+	glm::vec3 rig_position = glm::vec3(0.0f,0.0f,2.0f);
 	glm::vec3 rig_up = glm::vec3(0.0f,1.0f,0.0f);
 	glm::vec3 rig_target = glm::vec3(0.0f,0.0f,1.0f);
-        float rig_dioc = 0.065;
-        m_rig = new Rig(m_camera_one,m_camera_two,rig_position, rig_dioc, rig_up,rig_target,m_width,m_height);
+	float rig_dioc = 0.065;
+	m_rig = new Rig(m_camera_one,m_camera_two,rig_position, rig_dioc, rig_up,rig_target,m_width,m_height);
 	
 	//Generating textures
 	glGenTextures(1, &m_left_render_texture);
@@ -204,7 +204,7 @@ void Renderer::render()
 		glUniformMatrix4fv(m_lighting_no_texture_shader_model_matrix_position, 1, GL_FALSE, glm::value_ptr(m_object->get_model_matrix()));
 		glUniformMatrix4fv(m_lighting_no_texture_shader_view_matrix_position, 1, GL_FALSE, glm::value_ptr(m_camera_one->get_view_matrix()));
 		glUniformMatrix4fv(m_lighting_no_texture_shader_projection_matrix_position, 1, GL_FALSE, glm::value_ptr(m_camera_one->get_projection_matrix()));
-		glUniform3fv(m_lighting_no_texture_shader_camera_position, GL_FALSE, glm::value_ptr(m_camera_one->get_position()));
+		glUniform3fv(m_lighting_no_texture_shader_camera_position, GL_FALSE, glm::value_ptr(m_camera_two->get_position()));
 	}
 	
 	//~ Binding vao
@@ -361,26 +361,4 @@ Camera* Renderer::get_camera_one() const
 Camera* Renderer::get_camera_two() const
 {
 	return m_camera_two;
-}
-
-void Renderer::reset_cameras_dioc()
-{
-	m_camera_one->set_dioc(0.065);
-	m_camera_two->set_dioc(0.065);
-
-        //m_camera_one->set_position();
-	
-	m_camera_one->compute_projection_matrix();
-	m_camera_two->compute_projection_matrix();
-}
-
-void Renderer::set_cameras_dioc(const float delta)
-{
-	float dioc = m_camera_one->get_dioc();
-	m_camera_one->set_dioc(dioc + delta);
-	dioc = m_camera_two->get_dioc();
-	m_camera_two->set_dioc(dioc + delta);
-	
-	m_camera_one->compute_projection_matrix();
-	m_camera_two->compute_projection_matrix();
 }

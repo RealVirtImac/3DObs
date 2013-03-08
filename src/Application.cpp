@@ -29,7 +29,7 @@ bool Application::on_init()
 	m_width = 1280;
 	m_height = 720;
 
-	for(int i = 0; i < 4; ++i)
+	for(int i = 0; i < 6; ++i)
 	{
 		m_input_keys.push_back(false);
 	}
@@ -103,20 +103,25 @@ void Application::on_loop()
 	if(m_joystick != NULL)
 	{
 		int epsilon = 4000;
-		//~ Forward / Backward
+		//~ //Forward / Backward
 		if(SDL_JoystickGetAxis(m_joystick, 1) > epsilon) m_renderer->get_rig()->update_position(0);
 		if(SDL_JoystickGetAxis(m_joystick, 1) < -epsilon) m_renderer->get_rig()->update_position(1);
-		//~ Left / Right
+		//~ //Left / Right
 		if(SDL_JoystickGetAxis(m_joystick, 0) < -epsilon) m_renderer->get_rig()->update_position(2);
 		if(SDL_JoystickGetAxis(m_joystick, 0) > epsilon) m_renderer->get_rig()->update_position(3);
 		
 		int delta = 10;
-		//~ Eyes to the left / Right
+		//~ //Eyes to the left / Right
 		if(SDL_JoystickGetAxis(m_joystick, 2) < -epsilon) m_mouse_x -= delta;
 		if(SDL_JoystickGetAxis(m_joystick, 2) > epsilon) m_mouse_x += delta;
-		//~ Eyes to the ground / sky
+		//~ //Eyes to the ground / sky
 		if(SDL_JoystickGetAxis(m_joystick, 3) < -epsilon) m_mouse_y -= delta;
 		if(SDL_JoystickGetAxis(m_joystick, 3) > epsilon) m_mouse_y += delta;
+		
+		//~ RT
+		if(SDL_JoystickGetAxis(m_joystick, 4) > 128 ) m_renderer->get_rig()->update_position(4);
+		//~ LT
+		if(SDL_JoystickGetAxis(m_joystick, 5) > 128 ) m_renderer->get_rig()->update_position(5);
 	}
 
 	m_renderer->get_rig()->update_horizontal_angle(m_mouse_x);
@@ -151,7 +156,11 @@ void Application::on_event(SDL_Event* Event)
 			//~ Right
 			case SDLK_d : 	m_input_keys.at(3) = true;
 			break;
-			case SDLK_o : m_renderer->reset_cameras_dioc();
+			//~ Up
+			case SDLK_r : 	m_input_keys.at(4) = true;
+			break;
+			//~ Down
+			case SDLK_f : 	m_input_keys.at(5) = true;
 			break;
 			default : ;
 			break;
@@ -175,44 +184,22 @@ void Application::on_event(SDL_Event* Event)
 			//~ Right
 			case SDLK_d : 	m_input_keys.at(3) = false;
 			break;
+			//~ Up
+			case SDLK_r : 	m_input_keys.at(4) = false;
+			break;
+			//~ Down
+			case SDLK_f : 	m_input_keys.at(5) = false;
+			break;
 			default : ;
 			break;
 		}
 	}
-	if(Event->type == SDL_MOUSEBUTTONDOWN)
-	{
-		float delta = 0.01;
-		if (Event->button.button == SDL_BUTTON_WHEELUP)
-		{
-			m_renderer->set_cameras_dioc(delta);
-		}
-		if (Event->button.button == SDL_BUTTON_WHEELDOWN)
-		{
-			m_renderer->set_cameras_dioc(-delta);
-		}
-	}
 	if(Event->type == SDL_JOYBUTTONDOWN)
 	{
-		if((int)Event->jbutton.button == 0)
-		{
-			m_renderer->reset_cameras_dioc();
-		}
+		std::cout << (int)Event->jbutton.button << std::endl;
 		if((int)Event->jbutton.button == 7)
 		{
 			m_running = false;
-		}
-	}
-	if(Event->type == SDL_JOYHATMOTION)
-	{
-		float delta = 0.01;
-		if(Event->jhat.value == SDL_HAT_UP)
-		{
-			m_renderer->set_cameras_dioc(delta);
-			
-		}
-		if(Event->jhat.value == SDL_HAT_DOWN)
-		{
-			m_renderer->set_cameras_dioc(-delta);
 		}
 	}
 }

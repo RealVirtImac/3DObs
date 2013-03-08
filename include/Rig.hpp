@@ -74,6 +74,7 @@ class Rig
 		 * \return The position of the rig
 		 */ 
 		glm::vec3 get_position() const;
+		glm::vec3 get_target() const;
 		
 	private:
 		Camera* m_camera_one;
