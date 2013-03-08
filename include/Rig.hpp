@@ -31,7 +31,7 @@ class Rig
 		 * \param width The width of the window
 		 * \param height The height of the window
 		 */ 
-                Rig(Camera* camera_one, Camera* camera_two, glm::vec3 position, float dioc, glm::vec3 up, glm::vec3 target, int width, int height);
+		Rig(Camera* camera_one, Camera* camera_two, glm::vec3 position, float dioc, glm::vec3 up, glm::vec3 target, int width, int height);
 		//! Destructor
 		~Rig();
 		
@@ -55,7 +55,7 @@ class Rig
 		/*!
 		 * \param direction The direction entered by the user (0,1,2,3)
 		 */
-		void update_position(const int direction);
+		void update_position(const int direction, const float delta);
 		//! Updates the horizontal angle of the rig thanks to the user's mouse
 		/*!
 		 * \param mouse_x The x-coordinate of the cursor in the window
@@ -74,6 +74,10 @@ class Rig
 		 * \return The position of the rig
 		 */ 
 		glm::vec3 get_position() const;
+		//! Gets the target of the rig
+		/*!
+		 * \return The target of the rig
+		 */ 
 		glm::vec3 get_target() const;
 		
 	private:

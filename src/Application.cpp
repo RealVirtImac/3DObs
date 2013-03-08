@@ -96,32 +96,31 @@ void Application::on_loop()
 	{
 		if(m_input_keys.at(i))
 		{
-			m_renderer->get_rig()->update_position(i);
+			m_renderer->get_rig()->update_position(i,1.0f);
 		}
 	}
 	
 	if(m_joystick != NULL)
 	{
-		int epsilon = 4000;
+		int epsilon = 3000;
 		//~ //Forward / Backward
-		if(SDL_JoystickGetAxis(m_joystick, 1) > epsilon) m_renderer->get_rig()->update_position(0);
-		if(SDL_JoystickGetAxis(m_joystick, 1) < -epsilon) m_renderer->get_rig()->update_position(1);
+		if(SDL_JoystickGetAxis(m_joystick, 1) > epsilon) m_renderer->get_rig()->update_position(0,abs(SDL_JoystickGetAxis(m_joystick, 1)/10000.0));
+		if(SDL_JoystickGetAxis(m_joystick, 1) < -epsilon) m_renderer->get_rig()->update_position(1,abs(SDL_JoystickGetAxis(m_joystick, 1)/10000.0));
 		//~ //Left / Right
-		if(SDL_JoystickGetAxis(m_joystick, 0) < -epsilon) m_renderer->get_rig()->update_position(2);
-		if(SDL_JoystickGetAxis(m_joystick, 0) > epsilon) m_renderer->get_rig()->update_position(3);
+		if(SDL_JoystickGetAxis(m_joystick, 0) < -epsilon) m_renderer->get_rig()->update_position(2,abs(SDL_JoystickGetAxis(m_joystick, 0)/10000.0));
+		if(SDL_JoystickGetAxis(m_joystick, 0) > epsilon) m_renderer->get_rig()->update_position(3,abs(SDL_JoystickGetAxis(m_joystick, 0)/10000.0));
 		
-		int delta = 10;
 		//~ //Eyes to the left / Right
-		if(SDL_JoystickGetAxis(m_joystick, 2) < -epsilon) m_mouse_x -= delta;
-		if(SDL_JoystickGetAxis(m_joystick, 2) > epsilon) m_mouse_x += delta;
+		if(SDL_JoystickGetAxis(m_joystick, 2) < -epsilon) m_mouse_x -= (abs(SDL_JoystickGetAxis(m_joystick, 2)/1000.0));
+		if(SDL_JoystickGetAxis(m_joystick, 2) > epsilon) m_mouse_x += (abs(SDL_JoystickGetAxis(m_joystick, 2)/1000.0));
 		//~ //Eyes to the ground / sky
-		if(SDL_JoystickGetAxis(m_joystick, 3) < -epsilon) m_mouse_y -= delta;
-		if(SDL_JoystickGetAxis(m_joystick, 3) > epsilon) m_mouse_y += delta;
+		if(SDL_JoystickGetAxis(m_joystick, 3) < -epsilon) m_mouse_y -= (abs(SDL_JoystickGetAxis(m_joystick, 3)/1000.0));
+		if(SDL_JoystickGetAxis(m_joystick, 3) > epsilon) m_mouse_y += (abs(SDL_JoystickGetAxis(m_joystick, 3)/1000.0));
 		
 		//~ RT
-		if(SDL_JoystickGetAxis(m_joystick, 4) > 128 ) m_renderer->get_rig()->update_position(4);
+		if(SDL_JoystickGetAxis(m_joystick, 4) > 1 ) m_renderer->get_rig()->update_position(4,1.0f);
 		//~ LT
-		if(SDL_JoystickGetAxis(m_joystick, 5) > 128 ) m_renderer->get_rig()->update_position(5);
+		if(SDL_JoystickGetAxis(m_joystick, 5) > 1 ) m_renderer->get_rig()->update_position(5,1.0f);
 	}
 
 	m_renderer->get_rig()->update_horizontal_angle(m_mouse_x);
@@ -196,7 +195,6 @@ void Application::on_event(SDL_Event* Event)
 	}
 	if(Event->type == SDL_JOYBUTTONDOWN)
 	{
-		std::cout << (int)Event->jbutton.button << std::endl;
 		if((int)Event->jbutton.button == 7)
 		{
 			m_running = false;

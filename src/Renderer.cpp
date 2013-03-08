@@ -15,10 +15,10 @@ Renderer::Renderer(int width, int height):
 		throw std::runtime_error((const char*)glewGetErrorString(error));
 	}
 	//~ Loading object
-	m_object = new Object("models/dna2.obj","textures/stargate.bmp");
+	m_object = new Object("models/frigate.obj","textures/frigate.bmp");
 	m_object->set_model_matrix(glm::translate(m_object->get_model_matrix(),glm::vec3(0.00f,0.0f,-1.50f)));
-	m_object->set_model_matrix(glm::scale(m_object->get_model_matrix(),glm::vec3(0.75f,0.75f,0.75f)));
-	m_object->set_model_matrix(glm::rotate(m_object->get_model_matrix(), 0.0f, glm::vec3(1, 0, 0)));
+	m_object->set_model_matrix(glm::scale(m_object->get_model_matrix(),glm::vec3(0.12f,0.12f,0.12f)));
+	m_object->set_model_matrix(glm::rotate(m_object->get_model_matrix(), 90.0f, glm::vec3(0, 1, 0)));
 	//~ Loading quad
 	m_quad = new Object("models/quad.obj",NULL);
 	//~ Compiling shaders

@@ -40,7 +40,7 @@ Rig::~Rig()
 {
 }
 
-void Rig::update_position(const int direction)
+void Rig::update_position(const int direction, const float delta)
 {
 	glm::vec3 orthogonal_vector = glm::normalize(glm::cross(m_up,m_target));
 	glm::vec3 displacement = glm::vec3(0.0,0.0,0.0);
@@ -48,14 +48,14 @@ void Rig::update_position(const int direction)
 	switch(direction)
 	{
 		//~ Backward
-		case 0 : 	m_position -= m_target * m_speed;
+		case 0 : 	m_position -= m_target * (m_speed * delta);
 					displacement = (m_camera_one->get_dioc()/2)*orthogonal_vector;
 					
 					m_camera_one->set_position(m_position - displacement);
 					m_camera_two->set_position(m_position + displacement);
 		break;
 		//~ Forward
-		case 1 : 	m_position += m_target * m_speed;
+		case 1 : 	m_position += m_target * (m_speed * delta);
 					displacement = (m_camera_one->get_dioc()/2)*orthogonal_vector;
 					
 					m_camera_one->set_position(m_position - displacement);
@@ -66,7 +66,7 @@ void Rig::update_position(const int direction)
 						glm::vec3 right = glm::vec3(sin(m_horizontal_angle - M_PI/2.0f), 0, cos(m_horizontal_angle - M_PI/2.0f));
 						m_right = glm::normalize(right);
 
-						m_position -= right * m_speed;
+						m_position -= right * (m_speed * delta);
 
 						glm::vec3 displacement_camera = (m_camera_one->get_dioc()/2)*orthogonal_vector;
 						
@@ -79,7 +79,7 @@ void Rig::update_position(const int direction)
 						glm::vec3 right = glm::vec3(sin(m_horizontal_angle - M_PI/2.0f), 0, cos(m_horizontal_angle - M_PI/2.0f));
 						m_right = glm::normalize(right);
 
-						m_position += right * m_speed;
+						m_position += right * (m_speed * delta);
 
 						glm::vec3 displacement_camera = (m_camera_one->get_dioc()/2)*orthogonal_vector;
 						
@@ -89,7 +89,7 @@ void Rig::update_position(const int direction)
 		break;
 		//~ Up
 		case 4 :	{
-						m_position.y += m_speed;
+						m_position.y += (m_speed * delta);
 						displacement = (m_camera_one->get_dioc()/2)*orthogonal_vector;
 						m_camera_one->set_position(m_position - displacement);
 						m_camera_two->set_position(m_position + displacement);
@@ -97,7 +97,7 @@ void Rig::update_position(const int direction)
 		break;
 		//~ Down
 		case 5 :	{
-						m_position.y -= m_speed;
+						m_position.y -= (m_speed * delta);
 						displacement = (m_camera_one->get_dioc()/2)*orthogonal_vector;
 						m_camera_one->set_position(m_position - displacement);
 						m_camera_two->set_position(m_position + displacement);
