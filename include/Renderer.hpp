@@ -18,6 +18,7 @@
 #include "Object.hpp"
 #include "Camera.hpp"
 #include "Rig.hpp"
+#include "Framebuffer.hpp"
 
 /*!
  * \brief Renderer of the context
@@ -89,13 +90,6 @@ class Renderer
 		GLuint m_quad_shader_texture_1;
 		GLuint m_quad_shader_texture_2;
 		
-		GLuint m_left_framebuffer;
-		GLuint m_left_render_texture;
-		GLuint m_left_depth_texture;
-		GLenum m_left_draw_buffers[1];
-		
-		GLuint m_right_framebuffer;
-		GLuint m_right_render_texture;
-		GLuint m_right_depth_texture;
-		GLenum m_right_draw_buffers[1];
+		Framebuffer* m_left_camera_framebuffer;
+		Framebuffer* m_right_camera_framebuffer;
 };

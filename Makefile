@@ -6,9 +6,9 @@ EXEC = 3DObs
 all:	$(EXEC)
 	
 
-$(EXEC): bin/Application.o bin/Object.o bin/Renderer.o bin/Camera.o bin/ObjLoader.o bin/Rig.o bin/main.o
+$(EXEC): bin/Application.o bin/Object.o bin/Renderer.o bin/Camera.o bin/ObjLoader.o bin/Rig.o bin/Framebuffer.o bin/main.o
 	@echo "\033[33;33m \t Linking \033[m\017" 
-	@$(CXX) -o $(EXEC) bin/Application.o bin/Object.o bin/Renderer.o bin/Camera.o bin/ObjLoader.o bin/Rig.o bin/main.o $(CFLAGS) $(LDFLAGS)
+	@$(CXX) -o $(EXEC) bin/Application.o bin/Object.o bin/Renderer.o bin/Camera.o bin/ObjLoader.o bin/Rig.o bin/Framebuffer.o bin/main.o $(CFLAGS) $(LDFLAGS)
 	@echo "\033[33;34m \t Done : type : ./3DObs to run \033[m\017"
 
 bin/Application.o: src/Application.cpp include/Application.hpp
@@ -41,6 +41,11 @@ bin/Rig.o: src/Rig.cpp include/Rig.hpp
 	@echo "\033[33;32m \t Compiling" $< "\033[m\017" 
 	@$(CXX) -c src/Rig.cpp $(CFLAGS)
 	@mv Rig.o bin/
+	
+bin/Framebuffer.o: src/Framebuffer.cpp include/Framebuffer.hpp
+	@echo "\033[33;32m \t Compiling" $< "\033[m\017" 
+	@$(CXX) -c src/Framebuffer.cpp $(CFLAGS)
+	@mv Framebuffer.o bin/
 
 bin/main.o: src/main.cpp
 	@echo "\033[33;32m \t Compiling" $< "\033[m\017" 

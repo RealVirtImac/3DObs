@@ -14,18 +14,22 @@ Renderer::Renderer(int width, int height):
 	if((error = glewInit()) != GLEW_OK) {
 		throw std::runtime_error((const char*)glewGetErrorString(error));
 	}
+	
 	//~ Loading object
 	m_object = new Object("models/frigate.obj","textures/frigate.bmp");
 	m_object->set_model_matrix(glm::translate(m_object->get_model_matrix(),glm::vec3(0.00f,0.0f,-1.50f)));
 	m_object->set_model_matrix(glm::scale(m_object->get_model_matrix(),glm::vec3(0.12f,0.12f,0.12f)));
 	m_object->set_model_matrix(glm::rotate(m_object->get_model_matrix(), 90.0f, glm::vec3(0, 1, 0)));
+	
 	//~ Loading quad
 	m_quad = new Object("models/quad.obj",NULL);
+	
 	//~ Compiling shaders
 	m_basic_shader_program = loadProgram("shaders/basic.vertex.glsl","shaders/basic.fragment.glsl");
 	m_lighting_shader_program = loadProgram("shaders/lighting.vertex.glsl","shaders/lighting.fragment.glsl");
 	m_lighting_no_texture_shader_program = loadProgram("shaders/lighting.vertex.glsl","shaders/lighting_no_tex.fragment.glsl");
 	m_quad_shader = loadProgram("shaders/quad.vertex.glsl","shaders/quad.fragment.glsl");
+	
 	//~ Locating uniforms
 	m_basic_shader_model_matrix_position = glGetUniformLocation(m_basic_shader_program,"model_matrix");
 	m_basic_shader_view_matrix_position = glGetUniformLocation(m_basic_shader_program,"view_matrix");
@@ -49,93 +53,29 @@ Renderer::Renderer(int width, int height):
 	m_camera_one = new Camera(m_width,m_height, 0);
 	m_camera_two = new Camera(m_width,m_height, 1);
 	
+	//~ Creating the rig
 	glm::vec3 rig_position = glm::vec3(0.0f,0.0f,2.0f);
 	glm::vec3 rig_up = glm::vec3(0.0f,1.0f,0.0f);
 	glm::vec3 rig_target = glm::vec3(0.0f,0.0f,1.0f);
 	float rig_dioc = 0.065;
 	m_rig = new Rig(m_camera_one,m_camera_two,rig_position, rig_dioc, rig_up,rig_target,m_width,m_height);
 	
-	//Generating textures
-	glGenTextures(1, &m_left_render_texture);
-	glGenTextures(1, &m_left_depth_texture);
-	//Binding textures
-	glBindTexture(GL_TEXTURE_2D, m_left_render_texture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, m_width, m_height, 0, GL_RGBA, GL_FLOAT, 0);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	
-	glBindTexture(GL_TEXTURE_2D, m_left_depth_texture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, m_width, m_height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	
-	glGenTextures(1, &m_right_render_texture);
-	glGenTextures(1, &m_right_depth_texture);
-	//Binding textures
-	glBindTexture(GL_TEXTURE_2D, m_right_render_texture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, m_width, m_height, 0, GL_RGBA, GL_FLOAT, 0);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	
-	glBindTexture(GL_TEXTURE_2D, m_right_depth_texture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, m_width, m_height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	
-	//~ //Generating framebuffers
-	glGenFramebuffers(1, &m_left_framebuffer);
-	//~ //Binding framebuffer
-	glBindFramebuffer(GL_FRAMEBUFFER, m_left_framebuffer);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_left_render_texture, 0);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_left_depth_texture, 0);
-	
-	m_left_draw_buffers[0] = GL_COLOR_ATTACHMENT0;
-	glDrawBuffers(1, m_left_draw_buffers);
-	
-	//~ //Unbind
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glBindTexture(GL_TEXTURE_2D, 0);
-	
-	//~ //Generating framebuffers
-	glGenFramebuffers(1, &m_right_framebuffer);
-	//~ //Binding framebuffer
-	glBindFramebuffer(GL_FRAMEBUFFER, m_right_framebuffer);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_right_render_texture, 0);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_right_depth_texture, 0);
-	
-	m_right_draw_buffers[0] = GL_COLOR_ATTACHMENT0;
-	glDrawBuffers(1, m_right_draw_buffers);
-	
-	//~ //Unbind
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glBindTexture(GL_TEXTURE_2D, 0);
-	
-	if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-		std::cout << "Framebuffer Error" << std::endl;
+	//~ Creating the framebuffers
+	m_left_camera_framebuffer = new Framebuffer(1,m_width,m_height);
+	m_right_camera_framebuffer = new Framebuffer(1,m_width,m_height);
 }
 
 
 
 Renderer::~Renderer()
 {
-	glDeleteTextures(1, &m_left_render_texture);
-	glDeleteTextures(1, &m_left_depth_texture);
-	glDeleteFramebuffers(1, &m_left_framebuffer);
-	
-	glDeleteTextures(1, &m_right_render_texture);
-	glDeleteTextures(1, &m_right_depth_texture);
-	glDeleteFramebuffers(1, &m_right_framebuffer);
-	
+	//~ Deleting Framebuffers
+	delete m_left_camera_framebuffer;
+	delete m_right_camera_framebuffer;
+	//~ Deleting objects
 	delete m_object;
 	delete m_quad;
+	//~ Deleting cameras and rig
 	delete m_camera_one;
 	delete m_camera_two;
 	delete m_rig;
@@ -146,8 +86,10 @@ void Renderer::render()
 	glClearColor(0.0,0.0,0.0,1.0);
 	glEnable(GL_DEPTH_TEST);
 	
-	glBindFramebuffer(GL_FRAMEBUFFER, m_left_framebuffer);
-	glDrawBuffers(1, m_left_draw_buffers);
+	//~ ------------------------------------------------------------------------------------------------------------
+	//~ Rendering the first camera
+	//~ ------------------------------------------------------------------------------------------------------------
+	glBindFramebuffer(GL_FRAMEBUFFER, m_left_camera_framebuffer->get_framebuffer_id());
 	glClearColor(0.0,0.0,0.0,1.0);
 	glViewport(0, 0, m_width, m_height);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -181,8 +123,10 @@ void Renderer::render()
 	glBindVertexArray(0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	
-	glBindFramebuffer(GL_FRAMEBUFFER, m_right_framebuffer);
-	glDrawBuffers(1, m_right_draw_buffers);
+	//~ ------------------------------------------------------------------------------------------------------------
+	//~ Rendering the second camera
+	//~ ------------------------------------------------------------------------------------------------------------
+	glBindFramebuffer(GL_FRAMEBUFFER, m_right_camera_framebuffer->get_framebuffer_id());
 	glClearColor(0.0,0.0,0.0,1.0);
 	glViewport(0, 0, m_width, m_height);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -216,6 +160,9 @@ void Renderer::render()
 	glBindVertexArray(0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	
+	//~ ------------------------------------------------------------------------------------------------------------
+	//~ Rendering the final view
+	//~ ------------------------------------------------------------------------------------------------------------
 	glClearColor(0.0,0.0,0.0,1.0);
 	glViewport(0, 0, m_width, m_height);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -223,10 +170,10 @@ void Renderer::render()
 	glUseProgram(m_quad_shader);
 	//~ //Sending uniforms
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, m_left_render_texture);
+	glBindTexture(GL_TEXTURE_2D, m_left_camera_framebuffer->get_texture_color_id()[0]);
 	glUniform1i(m_quad_shader_texture_1, 0);
 	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, m_right_render_texture);
+	glBindTexture(GL_TEXTURE_2D, m_right_camera_framebuffer->get_texture_color_id()[0]);
 	glUniform1i(m_quad_shader_texture_2, 1);
 	glUniformMatrix4fv(m_lighting_shader_model_matrix_position, 1, GL_FALSE, glm::value_ptr(m_quad->get_model_matrix()));
 	glUniformMatrix4fv(m_lighting_shader_view_matrix_position, 1, GL_FALSE, glm::value_ptr(m_camera_two->get_view_matrix()));
@@ -348,6 +295,7 @@ GLuint Renderer::loadProgram(const char* vertexShaderFile, const char* fragmentS
     return program;
 }
 
+//~ Getters
 Rig* Renderer::get_rig() const
 {
 	return m_rig;
