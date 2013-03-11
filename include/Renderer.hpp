@@ -54,6 +54,16 @@ class Renderer
 		 * \return The second camera
 		 */ 
 		Camera* get_camera_two() const;
+                //! Gets the view mode
+                /*!
+                 * \return the view mode
+                 */
+                int get_view_mode() const;
+                //! Sets the view mode
+                /*!
+                 * \set the view mode
+                 */
+                void set_view_mode(int mode);
 		
 	private:
 		int m_width;
@@ -64,9 +74,11 @@ class Renderer
 		
 		Rig* m_rig;
 		Object* m_object;
-		Object* m_quad;
+                Object* m_quad_left;
+                Object* m_quad_right;
 		Camera* m_camera_one;
 		Camera* m_camera_two;
+                int m_view_mode;
 		
 		GLuint m_basic_shader_program;
 		GLuint m_basic_shader_model_matrix_position;

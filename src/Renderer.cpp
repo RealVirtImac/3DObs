@@ -21,9 +21,10 @@ Renderer::Renderer(int width, int height):
 	m_object->set_model_matrix(glm::scale(m_object->get_model_matrix(),glm::vec3(0.12f,0.12f,0.12f)));
 	m_object->set_model_matrix(glm::rotate(m_object->get_model_matrix(), 90.0f, glm::vec3(0, 1, 0)));
 	
-	//~ Loading quad
-	m_quad = new Object("models/quad.obj",NULL);
-	
+        //~ Loading quads
+        m_quad_left = new Object("models/quad.obj",NULL);
+        m_quad_right = new Object("models/quad.obj",NULL);
+
 	//~ Compiling shaders
 	m_basic_shader_program = loadProgram("shaders/basic.vertex.glsl","shaders/basic.fragment.glsl");
 	m_lighting_shader_program = loadProgram("shaders/lighting.vertex.glsl","shaders/lighting.fragment.glsl");
@@ -63,6 +64,9 @@ Renderer::Renderer(int width, int height):
 	//~ Creating the framebuffers
 	m_left_camera_framebuffer = new Framebuffer(1,m_width,m_height);
 	m_right_camera_framebuffer = new Framebuffer(1,m_width,m_height);
+
+        //~ //Default view : Anaglyph
+        m_view_mode = 0;
 }
 
 
@@ -74,8 +78,9 @@ Renderer::~Renderer()
 	delete m_right_camera_framebuffer;
 	//~ Deleting objects
 	delete m_object;
-	delete m_quad;
-	//~ Deleting cameras and rig
+        delete m_quad_left;
+        delete m_quad_right;
+        //~ Deleting cameras and rig
 	delete m_camera_one;
 	delete m_camera_two;
 	delete m_rig;
@@ -163,32 +168,96 @@ void Renderer::render()
 	//~ ------------------------------------------------------------------------------------------------------------
 	//~ Rendering the final view
 	//~ ------------------------------------------------------------------------------------------------------------
-	glClearColor(0.0,0.0,0.0,1.0);
-	glViewport(0, 0, m_width, m_height);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	//~ //Choosing shader
-	glUseProgram(m_quad_shader);
-	//~ //Sending uniforms
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, m_left_camera_framebuffer->get_texture_color_id()[0]);
-	glUniform1i(m_quad_shader_texture_1, 0);
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, m_right_camera_framebuffer->get_texture_color_id()[0]);
-	glUniform1i(m_quad_shader_texture_2, 1);
-	glUniformMatrix4fv(m_lighting_shader_model_matrix_position, 1, GL_FALSE, glm::value_ptr(m_quad->get_model_matrix()));
-	glUniformMatrix4fv(m_lighting_shader_view_matrix_position, 1, GL_FALSE, glm::value_ptr(m_camera_two->get_view_matrix()));
-	glUniformMatrix4fv(m_lighting_shader_projection_matrix_position, 1, GL_FALSE, glm::value_ptr(glm::perspective(
-		m_camera_two->get_fov(),
-		m_camera_two->get_ratio(),
-		m_camera_two->get_near(),
-		m_camera_two->get_far())));
-	glUniform3fv(m_lighting_shader_camera_position, GL_FALSE, glm::value_ptr(m_rig->get_position()));
-	//~ //Binding vao
-	glBindVertexArray(m_quad->get_vao());
-	//~ //Drawing
-	glDrawArrays(GL_TRIANGLES, 0, m_quad->get_size());
-	//~ //Unbind
-	glBindVertexArray(0);
+
+        //~ //Anaglyph
+        if (m_view_mode == 0)
+        {
+            glClearColor(0.0,0.0,0.0,1.0);
+            glViewport(0, 0, m_width, m_height);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            //~ //Choosing shader
+            glUseProgram(m_quad_shader);
+            //~ //Sending uniforms
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, m_left_camera_framebuffer->get_texture_color_id()[0]);
+            glUniform1i(m_quad_shader_texture_1, 0);
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_2D, m_right_camera_framebuffer->get_texture_color_id()[0]);
+            glUniform1i(m_quad_shader_texture_2, 1);
+            glUniformMatrix4fv(m_lighting_shader_model_matrix_position, 1, GL_FALSE, glm::value_ptr(m_quad_left->get_model_matrix()));
+            glUniformMatrix4fv(m_lighting_shader_view_matrix_position, 1, GL_FALSE, glm::value_ptr(m_camera_two->get_view_matrix()));
+            glUniformMatrix4fv(m_lighting_shader_projection_matrix_position, 1, GL_FALSE, glm::value_ptr(glm::perspective(
+                    m_camera_two->get_fov(),
+                    m_camera_two->get_ratio(),
+                    m_camera_two->get_near(),
+                    m_camera_two->get_far())));
+            glUniform3fv(m_lighting_shader_camera_position, GL_FALSE, glm::value_ptr(m_rig->get_position()));
+            //~ //Binding vao
+            glBindVertexArray(m_quad_left->get_vao());
+            //~ //Drawing
+            glDrawArrays(GL_TRIANGLES, 0, m_quad_left->get_size());
+            //~ //Unbind
+            glBindVertexArray(0);
+        }
+        //~ //Side by side
+        else if(m_view_mode == 1)
+        {
+            //~ //Left view
+            glClearColor(0.0,0.0,0.0,1.0);
+            glViewport(0, 0, m_width/2, m_height);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            //~ //Choosing shader
+            glUseProgram(m_quad_shader);
+            //~ //Sending uniforms
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, m_left_camera_framebuffer->get_texture_color_id()[0]);
+            glUniform1i(m_quad_shader_texture_1, 0);
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_2D, m_left_camera_framebuffer->get_texture_color_id()[0]);
+            glUniform1i(m_quad_shader_texture_2, 1);
+            glUniformMatrix4fv(m_lighting_shader_model_matrix_position, 1, GL_FALSE, glm::value_ptr(m_quad_left->get_model_matrix()));
+            glUniformMatrix4fv(m_lighting_shader_view_matrix_position, 1, GL_FALSE, glm::value_ptr(m_camera_two->get_view_matrix()));
+            glUniformMatrix4fv(m_lighting_shader_projection_matrix_position, 1, GL_FALSE, glm::value_ptr(glm::perspective(
+                    m_camera_two->get_fov(),
+                    m_camera_two->get_ratio(),
+                    m_camera_two->get_near(),
+                    m_camera_two->get_far())));
+            glUniform3fv(m_lighting_shader_camera_position, GL_FALSE, glm::value_ptr(m_rig->get_position()));
+            //~ //Binding vao
+            glBindVertexArray(m_quad_left->get_vao());
+            //~ //Drawing
+            glDrawArrays(GL_TRIANGLES, 0, m_quad_left->get_size());
+            //~ //Unbind
+            glBindVertexArray(0);
+
+            //~ //Right view
+            glClearColor(0.0,0.0,0.0,1.0);
+            glViewport(m_width/2, 0, m_width/2, m_height);
+            //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            //~ //Choosing shader
+            glUseProgram(m_quad_shader);
+            //~ //Sending uniforms
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, m_right_camera_framebuffer->get_texture_color_id()[0]);
+            glUniform1i(m_quad_shader_texture_1, 0);
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_2D, m_right_camera_framebuffer->get_texture_color_id()[0]);
+            glUniform1i(m_quad_shader_texture_2, 1);
+            glUniformMatrix4fv(m_lighting_shader_model_matrix_position, 1, GL_FALSE, glm::value_ptr(m_quad_right->get_model_matrix()));
+            glUniformMatrix4fv(m_lighting_shader_view_matrix_position, 1, GL_FALSE, glm::value_ptr(m_camera_two->get_view_matrix()));
+            glUniformMatrix4fv(m_lighting_shader_projection_matrix_position, 1, GL_FALSE, glm::value_ptr(glm::perspective(
+                    m_camera_two->get_fov(),
+                    m_camera_two->get_ratio(),
+                    m_camera_two->get_near(),
+                    m_camera_two->get_far())));
+            glUniform3fv(m_lighting_shader_camera_position, GL_FALSE, glm::value_ptr(m_rig->get_position()));
+            //~ //Binding vao
+            glBindVertexArray(m_quad_right->get_vao());
+            //~ //Drawing
+            glDrawArrays(GL_TRIANGLES, 0, m_quad_right->get_size());
+            //~ //Unbind
+            glBindVertexArray(0);
+        }
 }
 
 const char* Renderer::readFile(const char* filePath) {
@@ -309,4 +378,14 @@ Camera* Renderer::get_camera_one() const
 Camera* Renderer::get_camera_two() const
 {
 	return m_camera_two;
+}
+
+int Renderer::get_view_mode() const
+{
+    return m_view_mode;
+}
+
+void Renderer::set_view_mode(int mode)
+{
+    m_view_mode = mode;
 }

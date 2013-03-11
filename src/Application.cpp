@@ -189,6 +189,13 @@ void Application::on_event(SDL_Event* Event)
 			//~ Down
 			case SDLK_f : 	m_input_keys.at(5) = false;
 			break;
+                        //~ Switch view mode
+                        case SDLK_a :
+                            if (m_renderer->get_view_mode() == 0)
+                                m_renderer->set_view_mode(1);
+                            else  if (m_renderer->get_view_mode() == 1)
+                                m_renderer->set_view_mode(0);
+                        break;
 			default : ;
 			break;
 		}
