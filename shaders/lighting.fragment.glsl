@@ -29,7 +29,7 @@ void main(void)
 	vec3 diffuse = texture(diffuse_texture, uv).rgb;
 	
 	vec3  lightColor = vec3(1.0, 1.0, 1.0);
-	float lightIntensity = 2.5;
+        float lightIntensity = 5.5;
 	float specular = 0;
 	float distance = 1.8;
 	
