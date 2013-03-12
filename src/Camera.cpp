@@ -11,7 +11,7 @@ Camera::Camera(int width, int height, int type):
 	m_type(type),
 	m_fov(45.0f),
 	m_ratio((float)width/(float)height),
-        m_near(/*0.15f*/1.20f),
+        m_near(/*0.15f*//*1.20f*/2.0f*(2.0f/3.0f)),
         m_far(/*0.100f*/7.0f),
 	m_horizontal_angle(M_PI),
 	m_vertical_angle(0.0f),
