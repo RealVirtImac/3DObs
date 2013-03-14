@@ -8,35 +8,41 @@
 
 Object::Object(const char* filename, const char* texture_path)
 {
+
+	//~ Creating the scene of the model
 	const aiScene* scene = aiImportFile(filename,aiProcess_FlipUVs | aiProcess_Triangulate);
 	
-	for(unsigned int n_mesh = 0; n_mesh < scene->mNumMeshes; ++n_mesh)
+	//~ Parsing its meshes
+	for (unsigned int index_mesh = 0; index_mesh < scene->mNumMeshes; ++index_mesh) 
 	{
-		aiMesh* mesh = scene->mMeshes[n_mesh];
-		
-		for(unsigned int i = 0; i < mesh->mNumFaces; ++i)
+		//~ Selecting a mesh
+		const aiMesh* mesh = scene->mMeshes[index_mesh];
+		//~ Parsing its vertices
+		for (unsigned int index_vertice = 0; index_vertice < mesh->mNumVertices; ++index_vertice) 
 		{
-			const aiFace& face = mesh->mFaces[i];
-			for(int j = 0; j < 3; ++j)
+			//~ Vertices
+			if (mesh->HasPositions())
 			{
-				if(mesh->HasTextureCoords(0))
-				{
-					aiVector3D uv = mesh->mTextureCoords[0][face.mIndices[j]];
-					glm::vec2 uvs = glm::vec2(uv[0],uv[1]);
-					m_uvs.push_back(uvs);
-				}
-				
-				aiVector3D normal = mesh->mNormals[face.mIndices[j]];
-				glm::vec3 normals = glm::vec3(normal[0],normal[1],normal[2]);
-				m_normals.push_back(normals);
-				
-				aiVector3D pos = mesh->mVertices[face.mIndices[j]];
-				glm::vec3 poss = glm::vec3(pos[0],pos[1],pos[2]);
-				m_vertices.push_back(poss);
+				const aiVector3D* vp = &(mesh->mVertices[index_vertice]);
+				m_vertices.push_back(glm::vec3(vp->x,vp->y,vp->z));
+			}
+			//~ Normals
+			if (mesh->HasNormals())
+			{
+				const aiVector3D* vn = &(mesh->mNormals[index_vertice]);
+				m_normals.push_back(glm::vec3(vn->x,vn->y,vn->z));
+			}
+			//~ UVs
+			if (mesh->HasTextureCoords(0)) 
+			{
+				const aiVector3D* vt = &(mesh->mTextureCoords[0][index_vertice]);
+				m_uvs.push_back(glm::vec2(vt->x,vt->y));
 			}
 		}
 	}
 	
+	//~ Freeing the memory
+	aiReleaseImport(scene);
 	//~ Initializing model matrix
 	m_model_matrix = glm::mat4(1.0);
 	//~ Creating buffers
@@ -137,7 +143,6 @@ glm::vec3 Object::computeBarycentre()
 float Object::computeAvgDistToBarycentre()
 {
     glm::vec3 bar = computeBarycentre();
-    std::cout<<bar.x<<", "<<bar.y<<", "<<bar.z<<std::endl;
     float sumDist = 0;
     float avgDist = 0;
 
