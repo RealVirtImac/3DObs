@@ -6,9 +6,9 @@ EXEC = 3DObs
 all:	$(EXEC)
 	
 
-$(EXEC): bin/Application.o bin/Object.o bin/Renderer.o bin/Camera.o bin/Rig.o bin/Framebuffer.o bin/main.o
+$(EXEC): bin/Application.o bin/Object.o bin/Renderer.o bin/Camera.o bin/Rig.o bin/Framebuffer.o bin/stb_image.o bin/main.o
 	@echo "\033[33;33m \t Linking \033[m\017" 
-	@$(CXX) -o $(EXEC) bin/Application.o bin/Object.o bin/Renderer.o bin/Camera.o bin/Rig.o bin/Framebuffer.o bin/main.o $(CFLAGS) $(LDFLAGS)
+	@$(CXX) -o $(EXEC) bin/Application.o bin/Object.o bin/Renderer.o bin/Camera.o bin/Rig.o bin/Framebuffer.o bin/stb_image.o bin/main.o $(CFLAGS) $(LDFLAGS)
 	@echo "\033[33;34m \t Done : type : ./3DObs to run \033[m\017"
 
 bin/Application.o: src/Application.cpp include/Application.hpp
@@ -36,6 +36,11 @@ bin/Rig.o: src/Rig.cpp include/Rig.hpp
 	@echo "\033[33;32m \t Compiling" $< "\033[m\017" 
 	@$(CXX) -c src/Rig.cpp $(CFLAGS)
 	@mv Rig.o bin/
+
+bin/stb_image.o: include/stb_image/stb_image.c include/stb_image/stb_image.h
+	@echo "\033[33;32m \t Compiling" $< "\033[m\017" 
+	@$(CXX) -c include/stb_image/stb_image.c $(CFLAGS) -Wno-missing-field-initializers -Wno-unused-but-set-variable
+	@mv stb_image.o bin/
 	
 bin/Framebuffer.o: src/Framebuffer.cpp include/Framebuffer.hpp
 	@echo "\033[33;32m \t Compiling" $< "\033[m\017" 
@@ -44,7 +49,7 @@ bin/Framebuffer.o: src/Framebuffer.cpp include/Framebuffer.hpp
 
 bin/main.o: src/main.cpp
 	@echo "\033[33;32m \t Compiling" $< "\033[m\017" 
-	@$(CXX) -c src/main.cpp $(CFLAGS)
+	@$(CXX) -c src/main.cpp $(CFLAGS) -Wno-unused-parameter
 	@mv main.o bin/
 
 clean:

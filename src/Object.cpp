@@ -6,10 +6,14 @@
 
 #include "../include/Object.hpp"
 
-Object::Object(const char* filename, const char* texture_path)
+Object::Object(const char* filename, const char* texture_path) throw (int)
 {
 	//~ Creating the scene of the model
 	const aiScene* scene = aiImportFile(filename,aiProcess_FlipUVs | aiProcess_Triangulate);
+	if(!scene)
+	{
+		throw(0);
+	}
 	
 	//~ Parsing its meshes
 	for (unsigned int index_mesh = 0; index_mesh < scene->mNumMeshes; ++index_mesh) 
@@ -56,7 +60,6 @@ Object::~Object()
 	if(m_texture_path != NULL)
 	{
 		glDeleteTextures(1, &m_diffuse_texture);
-		SDL_FreeSurface(m_diffuse_texture_surface);
 	}
 	
 	glDeleteBuffers(1,&m_object_vertices_vbo);
@@ -97,35 +100,20 @@ void Object::create_buffers()
 
 void Object::load_textures()
 {
-	if((m_diffuse_texture_surface = SDL_LoadBMP(m_texture_path)))
-	{
-		//~ Properties
-		GLenum texture_format;
-		GLint nb_of_colors = m_diffuse_texture_surface->format->BytesPerPixel;
-        if (nb_of_colors == 4)
-        {
-                if (m_diffuse_texture_surface->format->Rmask == 0x000000ff)
-                        texture_format = GL_RGBA;
-                else
-                        texture_format = GL_BGRA;
-        } else if (nb_of_colors == 3)
-        {
-                if (m_diffuse_texture_surface->format->Rmask == 0x000000ff)
-                        texture_format = GL_RGB;
-                else
-                        texture_format = GL_BGR;
-        }
-		//~
-		glGenTextures(1, &m_diffuse_texture);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, m_diffuse_texture);
-		glTexImage2D(GL_TEXTURE_2D, 0, nb_of_colors, m_diffuse_texture_surface->w, m_diffuse_texture_surface->h, 0, texture_format, GL_UNSIGNED_BYTE, m_diffuse_texture_surface->pixels );
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glBindTexture(GL_TEXTURE_2D, 0);
-	}
+	//~ Declarating values : width, height, components per pixel
+	int w, h, comp;
+	//~ Calling stbi
+	unsigned char* diffuse = stbi_load(m_texture_path, &w, &h, &comp, 3);
+	//~ Processing texture
+	glGenTextures(1, &m_diffuse_texture);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, m_diffuse_texture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, diffuse);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 glm::vec3 Object::computeBarycentre()
