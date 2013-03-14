@@ -35,7 +35,7 @@ Renderer::Renderer(int width, int height):
 
         glm::vec3 barycentre = m_object->computeBarycentre();
         barycentre *= scale;
-        //m_object->set_model_matrix(glm::translate(m_object->get_model_matrix(),-barycentre));
+        m_object->set_model_matrix(glm::translate(m_object->get_model_matrix(),-barycentre));
 
         m_object->set_model_matrix(glm::rotate(m_object->get_model_matrix(), 90.0f, glm::vec3(0, 1, 0)));
 	
