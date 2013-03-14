@@ -7,12 +7,13 @@
 #include "../include/Camera.hpp"
 #include <iostream>
 
-Camera::Camera(int width, int height, int type):
+Camera::Camera(int width, int height, float near, int type):
 	m_type(type),
 	m_fov(45.0f),
 	m_ratio((float)width/(float)height),
-	m_near(0.15f),
-	m_far(100.0f),
+        m_near(near),
+        //m_far(2.0f + 2.0f*(1.0f/3.0f)), //THEORY!
+        m_far(100.0f),
 	m_horizontal_angle(M_PI),
 	m_vertical_angle(0.0f),
 	m_width(width),
@@ -30,9 +31,8 @@ void Camera::compute_view_matrix()
 	m_view_matrix = glm::lookAt(m_position,m_position+m_target,m_up);
 }
 
-void Camera::compute_projection_matrix()
+void Camera::compute_projection_matrix(float dc)
 {
-	float dc = 2.0;
 	float L = 4.0;
 	float H = L/m_ratio;
 

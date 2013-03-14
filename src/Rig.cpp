@@ -6,7 +6,7 @@
 
 #include "../include/Rig.hpp"
 
-Rig::Rig(Camera* camera_one, Camera* camera_two, glm::vec3 position, float dioc, glm::vec3 up, glm::vec3 target, int width, int height):
+Rig::Rig(Camera* camera_one, Camera* camera_two, glm::vec3 position, float dioc, float dc, glm::vec3 up, glm::vec3 target, int width, int height):
 	m_camera_one(camera_one),
 	m_camera_two(camera_two),
 	m_position(position),
@@ -28,8 +28,8 @@ Rig::Rig(Camera* camera_one, Camera* camera_two, glm::vec3 position, float dioc,
 	m_camera_one->set_up(m_up);
 	m_camera_two->set_up(m_up);
 
-	m_camera_one->compute_projection_matrix();
-	m_camera_two->compute_projection_matrix();
+        m_camera_one->compute_projection_matrix(dc);
+        m_camera_two->compute_projection_matrix(dc);
 
 	m_camera_one->set_position(m_position);
 	m_camera_two->set_position(m_position);

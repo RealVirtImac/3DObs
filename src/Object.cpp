@@ -124,6 +124,63 @@ void Object::load_textures()
 	}
 }
 
+glm::vec3 Object::computeBarycentre()
+{
+    glm::vec3 sum = glm::vec3(0.0, 0.0, 0.0);
+    for (unsigned int i = 0; i < m_vertices.size(); ++i)
+    {
+        sum += m_vertices.at(i);
+    }
+
+    return sum /= m_vertices.size();
+}
+
+float Object::computeAvgDistToBarycentre()
+{
+    glm::vec3 bar = computeBarycentre();
+    std::cout<<bar.x<<", "<<bar.y<<", "<<bar.z<<std::endl;
+    float sumDist = 0;
+    float avgDist = 0;
+
+    for (unsigned int i = 0; i < m_vertices.size(); ++i)
+    {
+        sumDist += sqrt((m_vertices.at(i).x - bar.x)*(m_vertices.at(i).x - bar.x) +
+                        (m_vertices.at(i).y - bar.y)*(m_vertices.at(i).y - bar.y) +
+                        (m_vertices.at(i).z - bar.z)*(m_vertices.at(i).z - bar.z));
+    }
+    avgDist = sumDist / m_vertices.size();
+    return avgDist;
+}
+
+float Object::computeStandardDeviation()
+{
+    glm::vec3 moyPt;
+    moyPt = computeBarycentre();
+    float sumDist = 0;
+    float moyDist = 0;
+
+    for (unsigned int i = 0; i < m_vertices.size(); ++i)
+    {
+        sumDist += sqrt((m_vertices.at(i).x - moyPt.x)*(m_vertices.at(i).x - moyPt.x) +
+                        (m_vertices.at(i).y - moyPt.y)*(m_vertices.at(i).y - moyPt.y) +
+                        (m_vertices.at(i).z - moyPt.z)*(m_vertices.at(i).z - moyPt.z));
+    }
+    moyDist = sumDist / m_vertices.size();
+
+    float sumValMoinsMoy = 0;
+    float var = 0;
+    for (unsigned int i = 0; i < m_vertices.size(); ++i)
+    {
+        sumValMoinsMoy += pow(sqrt((m_vertices.at(i).x - moyPt.x)*(m_vertices.at(i).x - moyPt.x) +
+                               (m_vertices.at(i).y - moyPt.y)*(m_vertices.at(i).y - moyPt.y) +
+                               (m_vertices.at(i).z - moyPt.z)*(m_vertices.at(i).z - moyPt.z))
+                          - moyDist, 2);
+    }
+    var = sumValMoinsMoy / m_vertices.size();
+
+    return sqrt(var);
+}
+
 //~ Setters
 void Object::set_model_matrix(const glm::mat4 input_matrix)
 {
