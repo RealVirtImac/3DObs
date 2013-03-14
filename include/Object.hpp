@@ -12,10 +12,10 @@
 #include <iostream>
 #include <SDL/SDL.h>
 
-#include <assimp/assimp.hpp>
-#include <assimp/aiScene.h>
-#include <assimp/aiPostProcess.h>
-#include <assimp/aiMesh.h>
+#include <assimp/cimport.h>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+#include <assimp/mesh.h>
 
 #include "ObjLoader.hpp"
 #include "glm/glm.hpp"

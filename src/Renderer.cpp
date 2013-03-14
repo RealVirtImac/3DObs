@@ -15,29 +15,22 @@ Renderer::Renderer(int width, int height):
 		throw std::runtime_error((const char*)glewGetErrorString(error));
 	}
 
-        //~ Distance between camera and virtual screen
-        float dc = 2.00f;
+	//~ Distance between camera and virtual screen
+	float dc = 2.00f;
 	
 	//~ Loading object
-        m_object = new Object("models/frigate.obj","textures/frigate.bmp");
-        m_object->set_model_matrix(glm::translate(m_object->get_model_matrix(),glm::vec3(0.00f,0.00f,-dc)));
+	m_object = new Object("models/frigate.obj","textures/frigate.bmp");
+	m_object->set_model_matrix(glm::translate(m_object->get_model_matrix(),glm::vec3(0.00f,0.00f,-dc)));
 
-        float standardDeviation = m_object->computeStandardDeviation();
-        std::cout<<"ECART TYPE : "<<standardDeviation<<std::endl;
+	float avgDistToBarycentre = m_object->computeAvgDistToBarycentre();
+	float scale = (dc*(2.0f/3.0f))/avgDistToBarycentre;
+	m_object->set_model_matrix(glm::scale(m_object->get_model_matrix(),glm::vec3(scale,scale,scale)));
 
-        float avgDistToBarycentre = m_object->computeAvgDistToBarycentre();
-        std::cout<<"MOYENNE DIST : " <<avgDistToBarycentre<<std::endl;
+	glm::vec3 barycentre = m_object->computeBarycentre();
+	barycentre *= scale;
+	m_object->set_model_matrix(glm::translate(m_object->get_model_matrix(),-barycentre));
 
-
-        float scale = (dc*(2.0f/3.0f))/avgDistToBarycentre;
-        std::cout<<"SCALE : "<<scale<<std::endl;
-        m_object->set_model_matrix(glm::scale(m_object->get_model_matrix(),glm::vec3(scale,scale,scale)));
-
-        glm::vec3 barycentre = m_object->computeBarycentre();
-        barycentre *= scale;
-        m_object->set_model_matrix(glm::translate(m_object->get_model_matrix(),-barycentre));
-
-        m_object->set_model_matrix(glm::rotate(m_object->get_model_matrix(), 90.0f, glm::vec3(0, 1, 0)));
+	m_object->set_model_matrix(glm::rotate(m_object->get_model_matrix(), 90.0f, glm::vec3(0, 1, 0)));
 	
 	//~ Loading quads
 	m_quad_left = new Object("models/quad.obj",NULL);
@@ -69,22 +62,22 @@ Renderer::Renderer(int width, int height):
 	m_quad_shader_texture_2 = glGetUniformLocation(m_quad_shader, "renderedTexture2");
 	
 	//~ Creating camera
-        m_camera_one = new Camera(m_width,m_height, dc*(2.0f/3.0f), 0);
-        m_camera_two = new Camera(m_width,m_height, dc*(2.0f/3.0f), 1);
+	m_camera_one = new Camera(m_width,m_height, dc*(2.0f/3.0f), 0);
+	m_camera_two = new Camera(m_width,m_height, dc*(2.0f/3.0f), 1);
 	
 	//~ Creating the rig
 	glm::vec3 rig_position = glm::vec3(0.0f,0.0f,2.0f);
 	glm::vec3 rig_up = glm::vec3(0.0f,1.0f,0.0f);
 	glm::vec3 rig_target = glm::vec3(0.0f,0.0f,1.0f);
 	float rig_dioc = 0.065;
-        m_rig = new Rig(m_camera_one,m_camera_two,rig_position, rig_dioc, dc, rig_up,rig_target,m_width,m_height);
+	m_rig = new Rig(m_camera_one,m_camera_two,rig_position, rig_dioc, dc, rig_up,rig_target,m_width,m_height);
 	
 	//~ Creating the framebuffers
 	m_left_camera_framebuffer = new Framebuffer(1,m_width,m_height);
 	m_right_camera_framebuffer = new Framebuffer(1,m_width,m_height);
 
-        //~ //Default view : Anaglyph
-        m_view_mode = 0;
+	//~ //Default view : Anaglyph
+	m_view_mode = 0;
 }
 
 
@@ -96,9 +89,9 @@ Renderer::~Renderer()
 	delete m_right_camera_framebuffer;
 	//~ Deleting objects
 	delete m_object;
-        delete m_quad_left;
-        delete m_quad_right;
-        //~ Deleting cameras and rig
+	delete m_quad_left;
+	delete m_quad_right;
+	//~ Deleting cameras and rig
 	delete m_camera_one;
 	delete m_camera_two;
 	delete m_rig;
