@@ -25,14 +25,14 @@ class Camera
 		 * \param height Height of the window
 		 * \param type 1 if we are considering the left camera, 0 otherwise 
 		 */
-		Camera(int width, int height, int type);
+                Camera(int width, int height,float near, int type);
 		//! Destructor
 		~Camera();
 		
 		//! Computes the View matrix from the position, the target and the up vectors of the camera
 		void compute_view_matrix();
 		//! Computes the Projection matrix
-		void compute_projection_matrix();
+                void compute_projection_matrix(float dc);
 		
 		//! Gets the View matrix
 		/*!

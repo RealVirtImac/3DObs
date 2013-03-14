@@ -41,6 +41,15 @@ class Object
 		void create_buffers();
 		//! Loads the textures thanks to SDL_LoadBMP
 		void load_textures();
+
+                //! Compute and return the barycentre of the object
+                glm::vec3 computeBarycentre();
+
+                //! Compute and return the standard deviation
+                float computeStandardDeviation();
+
+                //! Compute and return the average dist to the barycentre
+                float computeAvgDistToBarycentre();
 		
 		//! Gets the identifier of the diffuse texture
 		/*!
