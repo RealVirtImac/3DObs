@@ -6,21 +6,38 @@
 
 #include "../include/Object.hpp"
 
-Object::Object(const char* filename)
-{
-	//~ Loading OBJ
-	load_OBJ(filename, m_vertices, m_uvs, m_normals);
-	//~ Initializing model matrix
-	m_model_matrix = glm::mat4(1.0);
-	//~ Creating buffers
-	create_buffers();
-	m_texture_path = NULL;
-}
-
 Object::Object(const char* filename, const char* texture_path)
 {
-	//~ Loading OBJ
-	load_OBJ(filename, m_vertices, m_uvs, m_normals);
+	Assimp::Importer importer;
+	const aiScene* scene = importer.ReadFile(filename,aiProcess_FlipUVs | aiProcess_Triangulate);
+	
+	for(unsigned int n_mesh = 0; n_mesh < scene->mNumMeshes; ++n_mesh)
+	{
+		aiMesh* mesh = scene->mMeshes[n_mesh];
+		
+		for(unsigned int i = 0; i < mesh->mNumFaces; ++i)
+		{
+			const aiFace& face = mesh->mFaces[i];
+			for(int j = 0; j < 3; ++j)
+			{
+				if(mesh->HasTextureCoords(0))
+				{
+					aiVector3D uv = mesh->mTextureCoords[0][face.mIndices[j]];
+					glm::vec2 uvs = glm::vec2(uv[0],uv[1]);
+					m_uvs.push_back(uvs);
+				}
+				
+				aiVector3D normal = mesh->mNormals[face.mIndices[j]];
+				glm::vec3 normals = glm::vec3(normal[0],normal[1],normal[2]);
+				m_normals.push_back(normals);
+				
+				aiVector3D pos = mesh->mVertices[face.mIndices[j]];
+				glm::vec3 poss = glm::vec3(pos[0],pos[1],pos[2]);
+				m_vertices.push_back(poss);
+			}
+		}
+	}
+	
 	//~ Initializing model matrix
 	m_model_matrix = glm::mat4(1.0);
 	//~ Creating buffers

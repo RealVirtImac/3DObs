@@ -1,6 +1,6 @@
 CXX = g++
 CFLAGS = -W -Wall -ansi
-LDFLAGS = -lSDL -lGL -lGLEW
+LDFLAGS = -lSDL -lGL -lGLEW -lassimp
 EXEC = 3DObs
 
 all:	$(EXEC)

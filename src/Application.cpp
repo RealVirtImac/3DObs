@@ -156,10 +156,10 @@ void Application::on_event(SDL_Event* Event)
 			case SDLK_d : 	m_input_keys.at(3) = true;
 			break;
 			//~ Up
-			case SDLK_r : 	m_input_keys.at(4) = true;
+			case SDLK_t : 	m_input_keys.at(4) = true;
 			break;
 			//~ Down
-			case SDLK_f : 	m_input_keys.at(5) = true;
+			case SDLK_g : 	m_input_keys.at(5) = true;
 			break;
 			default : ;
 			break;
@@ -184,10 +184,10 @@ void Application::on_event(SDL_Event* Event)
 			case SDLK_d : 	m_input_keys.at(3) = false;
 			break;
 			//~ Up
-			case SDLK_r : 	m_input_keys.at(4) = false;
+			case SDLK_t : 	m_input_keys.at(4) = false;
 			break;
 			//~ Down
-			case SDLK_f : 	m_input_keys.at(5) = false;
+			case SDLK_g : 	m_input_keys.at(5) = false;
 			break;
                         //~ Switch view mode
                         case SDLK_a :

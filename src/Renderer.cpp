@@ -16,14 +16,14 @@ Renderer::Renderer(int width, int height):
 	}
 	
 	//~ Loading object
-	m_object = new Object("models/frigate.obj","textures/frigate.bmp");
-	m_object->set_model_matrix(glm::translate(m_object->get_model_matrix(),glm::vec3(0.00f,0.0f,-1.50f)));
+	m_object = new Object("models/Atlantis2.obj","textures/stargate.bmp");
+	m_object->set_model_matrix(glm::translate(m_object->get_model_matrix(),glm::vec3(0.0f,0.0f,-1.50f)));
 	m_object->set_model_matrix(glm::scale(m_object->get_model_matrix(),glm::vec3(0.12f,0.12f,0.12f)));
 	m_object->set_model_matrix(glm::rotate(m_object->get_model_matrix(), 90.0f, glm::vec3(0, 1, 0)));
 	
-        //~ Loading quads
-        m_quad_left = new Object("models/quad.obj",NULL);
-        m_quad_right = new Object("models/quad.obj",NULL);
+	//~ Loading quads
+	m_quad_left = new Object("models/quad.obj",NULL);
+	m_quad_right = new Object("models/quad.obj",NULL);
 
 	//~ Compiling shaders
 	m_basic_shader_program = loadProgram("shaders/basic.vertex.glsl","shaders/basic.fragment.glsl");
@@ -88,14 +88,14 @@ Renderer::~Renderer()
 
 void Renderer::render()
 {
-	glClearColor(0.0,0.0,0.0,1.0);
+	glClearColor(255.0,255.0,255.0,1.0);
 	glEnable(GL_DEPTH_TEST);
 	
 	//~ ------------------------------------------------------------------------------------------------------------
 	//~ Rendering the first camera
 	//~ ------------------------------------------------------------------------------------------------------------
 	glBindFramebuffer(GL_FRAMEBUFFER, m_left_camera_framebuffer->get_framebuffer_id());
-	glClearColor(0.0,0.0,0.0,1.0);
+	glClearColor(255.0,255.0,255.0,1.0);
 	glViewport(0, 0, m_width, m_height);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	//~ Choosing shader
@@ -132,7 +132,7 @@ void Renderer::render()
 	//~ Rendering the second camera
 	//~ ------------------------------------------------------------------------------------------------------------
 	glBindFramebuffer(GL_FRAMEBUFFER, m_right_camera_framebuffer->get_framebuffer_id());
-	glClearColor(0.0,0.0,0.0,1.0);
+	glClearColor(255.0,255.0,255.0,1.0);
 	glViewport(0, 0, m_width, m_height);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	//~ Choosing shader
@@ -172,7 +172,7 @@ void Renderer::render()
         //~ //Anaglyph
         if (m_view_mode == 0)
         {
-            glClearColor(0.0,0.0,0.0,1.0);
+            glClearColor(255.0,255.0,255.0,1.0);
             glViewport(0, 0, m_width, m_height);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             //~ //Choosing shader
@@ -203,7 +203,7 @@ void Renderer::render()
         else if(m_view_mode == 1)
         {
             //~ //Left view
-            glClearColor(0.0,0.0,0.0,1.0);
+            glClearColor(255.0,255.0,255.0,1.0);
             glViewport(0, 0, m_width/2, m_height);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             //~ //Choosing shader
@@ -231,7 +231,7 @@ void Renderer::render()
             glBindVertexArray(0);
 
             //~ //Right view
-            glClearColor(0.0,0.0,0.0,1.0);
+            glClearColor(255.0,255.0,255.0,1.0);
             glViewport(m_width/2, 0, m_width/2, m_height);
             //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             //~ //Choosing shader

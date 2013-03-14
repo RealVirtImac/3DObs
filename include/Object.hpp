@@ -12,6 +12,11 @@
 #include <iostream>
 #include <SDL/SDL.h>
 
+#include <assimp/assimp.hpp>
+#include <assimp/aiScene.h>
+#include <assimp/aiPostProcess.h>
+#include <assimp/aiMesh.h>
+
 #include "ObjLoader.hpp"
 #include "glm/glm.hpp"
 #include "glm/gtc/type_ptr.hpp"
@@ -23,11 +28,6 @@
 class Object
 {
 	public:
-		//! Constructor without texture
-		/*!
-		 *	\param filename Path of the obj model to load
-		 */
-		Object(const char* filename);
 		//! Constructor with texture
 		/*!
 		 *	\param filename Path of the obj model to load
