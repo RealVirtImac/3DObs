@@ -2,7 +2,7 @@ CXX = g++
 CFLAGS = -W -Wall -ansi
 LDFLAGS = -lSDL -lGL -lGLEW -lassimp
 EXEC = 3DObs
-
+#-L/usr/local/lib -lassimp
 all:	$(EXEC)
 	
 

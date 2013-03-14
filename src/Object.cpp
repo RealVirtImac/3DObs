@@ -8,8 +8,7 @@
 
 Object::Object(const char* filename, const char* texture_path)
 {
-	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile(filename,aiProcess_FlipUVs | aiProcess_Triangulate);
+	const aiScene* scene = aiImportFile(filename,aiProcess_FlipUVs | aiProcess_Triangulate);
 	
 	for(unsigned int n_mesh = 0; n_mesh < scene->mNumMeshes; ++n_mesh)
 	{
