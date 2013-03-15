@@ -17,7 +17,7 @@
 #include <assimp/postprocess.h>
 #include <assimp/mesh.h>
 
-#include "ObjLoader.hpp"
+#include "stb_image/stb_image.h"
 #include "glm/glm.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include "glm/gtc/matrix_transform.hpp"
@@ -33,23 +33,23 @@ class Object
 		 *	\param filename Path of the obj model to load
 		 *	\param texture_path Path of the texture to load
 		 */
-		Object(const char* filename, const char* texture_path);
+		Object(const char* filename, const char* texture_path) throw (int);
 		//! Destuctor
 		~Object();
 		
 		//! Creates all the required buffers for the objects (vertices, normals, uvs) and the associated VAO
 		void create_buffers();
-		//! Loads the textures thanks to SDL_LoadBMP
+		//! Loads the textures thanks to stb_image
 		void load_textures();
 
-                //! Compute and return the barycentre of the object
-                glm::vec3 computeBarycentre();
+		//! Compute and return the barycentre of the object
+		glm::vec3 computeBarycentre();
 
-                //! Compute and return the standard deviation
-                float computeStandardDeviation();
+		//! Compute and return the standard deviation
+		float computeStandardDeviation();
 
-                //! Compute and return the average dist to the barycentre
-                float computeAvgDistToBarycentre();
+		//! Compute and return the average dist to the barycentre
+		float computeAvgDistToBarycentre();
 		
 		//! Gets the identifier of the diffuse texture
 		/*!
@@ -93,6 +93,5 @@ class Object
 		GLuint m_object_uvs_vbo;
 		
 		const char* m_texture_path;
-		SDL_Surface* m_diffuse_texture_surface;
 		GLuint m_diffuse_texture;
 };

@@ -2,8 +2,8 @@
 ###################
 *.o
 *~
-*.obj
-*.bmp
+models/*
+textures/*
 
 3DObs
 

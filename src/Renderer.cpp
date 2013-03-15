@@ -17,9 +17,19 @@ Renderer::Renderer(int width, int height):
 
 	//~ Distance between camera and virtual screen
 	float dc = 2.00f;
-	
 	//~ Loading object
-	m_object = new Object("models/frigate.obj","textures/frigate.bmp");
+	try
+	{
+		m_object = new Object("models/frigate.obj","textures/frigate.jpg");
+	}
+	catch(int e)
+	{
+		switch(e)
+		{
+			case 0 : 	std::cout << "3D Model not found" << std::endl;
+						break;
+		}
+	}
 	m_object->set_model_matrix(glm::translate(m_object->get_model_matrix(),glm::vec3(0.00f,0.00f,-dc)));
 
 	float avgDistToBarycentre = m_object->computeAvgDistToBarycentre();
@@ -33,8 +43,19 @@ Renderer::Renderer(int width, int height):
 	m_object->set_model_matrix(glm::rotate(m_object->get_model_matrix(), 90.0f, glm::vec3(0, 1, 0)));
 	
 	//~ Loading quads
-	m_quad_left = new Object("models/quad.obj",NULL);
-	m_quad_right = new Object("models/quad.obj",NULL);
+	try
+	{
+		m_quad_left = new Object("models/quad.obj",NULL);
+		m_quad_right = new Object("models/quad.obj",NULL);
+	}
+	catch(int e)
+	{
+		switch(e)
+		{
+			case 0 : 	std::cout << "3D Model not found" << std::endl;
+						break;
+		}
+	}
 
 	//~ Compiling shaders
 	m_basic_shader_program = loadProgram("shaders/basic.vertex.glsl","shaders/basic.fragment.glsl");
@@ -99,14 +120,14 @@ Renderer::~Renderer()
 
 void Renderer::render()
 {
-	glClearColor(255.0,255.0,255.0,1.0);
+	glClearColor(0.0,0.0,0.0,1.0);
 	glEnable(GL_DEPTH_TEST);
 	
 	//~ ------------------------------------------------------------------------------------------------------------
 	//~ Rendering the first camera
 	//~ ------------------------------------------------------------------------------------------------------------
 	glBindFramebuffer(GL_FRAMEBUFFER, m_left_camera_framebuffer->get_framebuffer_id());
-	glClearColor(255.0,255.0,255.0,1.0);
+	glClearColor(0.0,0.0,0.0,1.0);
 	glViewport(0, 0, m_width, m_height);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	//~ Choosing shader
@@ -143,7 +164,7 @@ void Renderer::render()
 	//~ Rendering the second camera
 	//~ ------------------------------------------------------------------------------------------------------------
 	glBindFramebuffer(GL_FRAMEBUFFER, m_right_camera_framebuffer->get_framebuffer_id());
-	glClearColor(255.0,255.0,255.0,1.0);
+	glClearColor(0.0,0.0,0.0,1.0);
 	glViewport(0, 0, m_width, m_height);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	//~ Choosing shader
@@ -183,7 +204,7 @@ void Renderer::render()
         //~ //Anaglyph
         if (m_view_mode == 0)
         {
-            glClearColor(255.0,255.0,255.0,1.0);
+            glClearColor(0.0,0.0,0.0,1.0);
             glViewport(0, 0, m_width, m_height);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             //~ //Choosing shader
@@ -214,7 +235,7 @@ void Renderer::render()
         else if(m_view_mode == 1)
         {
             //~ //Left view
-            glClearColor(255.0,255.0,255.0,1.0);
+            glClearColor(0.0,0.0,0.0,1.0);
             glViewport(0, 0, m_width/2, m_height);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             //~ //Choosing shader
@@ -242,7 +263,7 @@ void Renderer::render()
             glBindVertexArray(0);
 
             //~ //Right view
-            glClearColor(255.0,255.0,255.0,1.0);
+            glClearColor(0.0,0.0,0.0,1.0);
             glViewport(m_width/2, 0, m_width/2, m_height);
             //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             //~ //Choosing shader
