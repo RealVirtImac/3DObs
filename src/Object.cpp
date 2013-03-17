@@ -115,6 +115,8 @@ void Object::load_textures()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glBindTexture(GL_TEXTURE_2D, 0);
+	
+	stbi_image_free(diffuse);
 }
 
 glm::vec3 Object::computeBarycentre()

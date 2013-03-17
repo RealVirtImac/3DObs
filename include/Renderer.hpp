@@ -12,13 +12,15 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <SDL/SDL.h>
 
 #include "glm/glm.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include "Object.hpp"
-#include "Camera.hpp"
 #include "Rig.hpp"
 #include "Framebuffer.hpp"
+#include "imgui/imgui.h"
+#include "imgui/imguiRenderGL.h"
 
 /*!
  * \brief Renderer of the context
@@ -44,26 +46,26 @@ class Renderer
 		 * \return The rig
 		 */ 
 		Rig* get_rig() const;
-		//! Gets the first camera
-		/*!
-		 * \return The first camera
-		 */ 
-		Camera* get_camera_one() const;
-		//! Gets the second camera
-		/*!
-		 * \return The second camera
-		 */ 
-		Camera* get_camera_two() const;
 		//! Gets the view mode
 		/*!
 		 * \return the view mode
 		 */
 		int get_view_mode() const;
+		//! Gets the display gui mode
+		/*!
+		 * \return the display gui mode
+		 */
+		bool get_display_gui() const;
 		//! Sets the view mode
 		/*!
-		 * \set the view mode
+		 * \param mode the view mode
 		 */
-		void set_view_mode(int mode);
+		void set_view_mode(const int mode);
+		//! Sets the display gui mode
+		/*!
+		 * \param mode the display mode
+		 */
+		void set_display_gui(const bool mode);
 		
 	private:
 		int m_width;
@@ -76,8 +78,6 @@ class Renderer
 		Object* m_object;
 		Object* m_quad_left;
 		Object* m_quad_right;
-		Camera* m_camera_one;
-		Camera* m_camera_two;
 		int m_view_mode;
 		
 		GLuint m_basic_shader_program;
@@ -104,4 +104,8 @@ class Renderer
 		
 		Framebuffer* m_left_camera_framebuffer;
 		Framebuffer* m_right_camera_framebuffer;
+		
+		bool m_display_gui;
+		
+		float data;
 };

@@ -9,7 +9,8 @@
 Application::Application():
 	m_running(true),
 	m_display(NULL),
-	m_joystick(NULL)
+	m_joystick(NULL),
+	m_display_gui(true)
 {
 }
 
@@ -54,11 +55,6 @@ bool Application::on_init()
 	m_renderer = new Renderer(m_width,m_height);
 	
 	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-	SDL_WarpMouse(m_width/2, m_height/2);
-	SDL_GetMouseState(&m_mouse_x,&m_mouse_y);
-	SDL_ShowCursor(SDL_DISABLE); 
-	
-	SDL_EnableKeyRepeat(10, 10);
 	return true;
 }
 
@@ -89,8 +85,29 @@ int Application::on_execute()
 
 void Application::on_loop()
 {
-	SDL_WarpMouse(m_width/2, m_height/2);
 	SDL_GetMouseState(&m_mouse_x,&m_mouse_y);
+	
+	if(m_display_gui)
+	{
+		m_renderer->get_rig()->update_horizontal_angle(m_width/2);
+		m_renderer->get_rig()->update_vertical_angle(m_height/2);
+		m_renderer->get_rig()->update_target();
+		
+		m_renderer->set_display_gui(true);
+		
+		SDL_ShowCursor(SDL_ENABLE);
+	}
+	else
+	{
+		SDL_WarpMouse(m_width/2, m_height/2);
+		m_renderer->get_rig()->update_horizontal_angle(m_mouse_x);
+		m_renderer->get_rig()->update_vertical_angle(m_mouse_y);
+		m_renderer->get_rig()->update_target();
+		
+		m_renderer->set_display_gui(false);
+		
+		SDL_ShowCursor(SDL_DISABLE);
+	}
 
 	for(unsigned int i = 0; i < m_input_keys.size(); ++i)
 	{
@@ -122,13 +139,9 @@ void Application::on_loop()
 		//~ LT
 		if(SDL_JoystickGetAxis(m_joystick, 5) > 1 ) m_renderer->get_rig()->update_position(5,1.0f);
 	}
-
-	m_renderer->get_rig()->update_horizontal_angle(m_mouse_x);
-	m_renderer->get_rig()->update_vertical_angle(m_mouse_y);
-	m_renderer->get_rig()->update_target();
 	
-	m_renderer->get_camera_one()->compute_view_matrix();
-	m_renderer->get_camera_two()->compute_view_matrix();
+	m_renderer->get_rig()->get_camera_one()->compute_view_matrix();
+	m_renderer->get_rig()->get_camera_two()->compute_view_matrix();
 }
 
 void Application::on_event(SDL_Event* Event)
@@ -136,6 +149,13 @@ void Application::on_event(SDL_Event* Event)
 	if(Event->type == SDL_QUIT)
 	{
 		m_running = false;
+	}
+	if(Event->type == SDL_MOUSEBUTTONDOWN)
+	{
+		if(Event->button.button == SDL_BUTTON_RIGHT)
+		{
+			m_display_gui = !m_display_gui;
+		}
 	}
 	if(Event->type == SDL_KEYDOWN)
 	{
@@ -189,13 +209,14 @@ void Application::on_event(SDL_Event* Event)
 			//~ Down
 			case SDLK_g : 	m_input_keys.at(5) = false;
 			break;
-                        //~ Switch view mode
-                        case SDLK_a :
-                            if (m_renderer->get_view_mode() == 0)
-                                m_renderer->set_view_mode(1);
-                            else  if (m_renderer->get_view_mode() == 1)
-                                m_renderer->set_view_mode(0);
-                        break;
+			//~ Switch view mode
+			case SDLK_a :
+				if (m_renderer->get_view_mode() == 0)
+					m_renderer->set_view_mode(1);
+				else  if (m_renderer->get_view_mode() == 1)
+					m_renderer->set_view_mode(0);
+			break;
+			break; 
 			default : ;
 			break;
 		}
