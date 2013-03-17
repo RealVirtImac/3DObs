@@ -4,6 +4,8 @@
 layout(location = 0) out vec3 FragColor;
 
 uniform vec3 camera_position;
+uniform float lightIntensity;
+uniform float distance;
 
 in vec2 uv;
 in vec3 position;
@@ -28,9 +30,7 @@ void main(void)
 	vec3 diffuse = vec3(1.0,1.0,1.0);
 	
 	vec3  lightColor = vec3(1.0, 1.0, 1.0);
-	float lightIntensity = 2.5;
 	float specular = 0;
-	float distance = 1.8;
 	
 	vec3  lightPosition = vec3(distance, distance, distance);
 	vec3 pl1 = PointLight(lightPosition,lightColor,lightIntensity,specular, n, diffuse);

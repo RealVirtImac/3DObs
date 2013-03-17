@@ -5,6 +5,8 @@ layout(location = 0) out vec3 FragColor;
 
 uniform vec3 camera_position;
 uniform sampler2D diffuse_texture;
+uniform float lightIntensity;
+uniform float distance;
 
 in vec2 uv;
 in vec3 position;
@@ -29,24 +31,24 @@ void main(void)
 	vec3 diffuse = texture(diffuse_texture, uv).rgb;
 	
 	vec3  lightColor = vec3(1.0, 1.0, 1.0);
-        float lightIntensity = 15.5;
+        //float lightIntensity = 15.5;
 	float specular = 0;
-        float distance = 4.8;
+        //float distance = 4.8;
 	
 	vec3  lightPosition = vec3(distance, distance, distance);
-	vec3 pl1 = PointLight(lightPosition,lightColor,lightIntensity,specular, n, diffuse);
+        vec3 pl1 = PointLight(lightPosition,lightColor,lightIntensity,specular, n, diffuse);
 	
 	lightPosition = vec3(-distance, distance, distance);
-	vec3 pl2 = PointLight(lightPosition,lightColor,lightIntensity,specular, n, diffuse);
+        vec3 pl2 = PointLight(lightPosition,lightColor,lightIntensity,specular, n, diffuse);
 	
 	lightPosition = vec3(-distance, -distance, distance);
-	vec3 pl3 = PointLight(lightPosition,lightColor,lightIntensity,specular, n, diffuse);
+        vec3 pl3 = PointLight(lightPosition,lightColor,lightIntensity,specular, n, diffuse);
 	
 	lightPosition = vec3(distance, -distance, distance);
-	vec3 pl4 = PointLight(lightPosition,lightColor,lightIntensity,specular, n, diffuse);
+        vec3 pl4 = PointLight(lightPosition,lightColor,lightIntensity,specular, n, diffuse);
 	
 	lightPosition = vec3(distance, distance, -distance);
-	vec3 pl5 = PointLight(lightPosition,lightColor,lightIntensity,specular, n, diffuse);
+        vec3 pl5 = PointLight(lightPosition,lightColor,lightIntensity,specular, n, diffuse);
 	
 	lightPosition = vec3(-distance, distance, -distance);
 	vec3 pl6 = PointLight(lightPosition,lightColor,lightIntensity,specular, n, diffuse);

@@ -81,14 +81,21 @@ Renderer::Renderer(int width, int height):
 	m_lighting_shader_projection_matrix_position = glGetUniformLocation(m_lighting_shader_program,"projection_matrix");
 	m_lighting_shader_camera_position = glGetUniformLocation(m_lighting_shader_program,"camera_position");
 	m_lighting_shader_diffuse_texture = glGetUniformLocation(m_lighting_shader_program, "diffuse_texture");
+        m_lighting_shader_light_intensity = glGetUniformLocation(m_lighting_shader_program, "lightIntensity");
+        m_lighting_shader_light_radius = glGetUniformLocation(m_lighting_shader_program, "distance");
 	
 	m_lighting_no_texture_shader_model_matrix_position = glGetUniformLocation(m_lighting_no_texture_shader_program,"model_matrix");
 	m_lighting_no_texture_shader_view_matrix_position = glGetUniformLocation(m_lighting_no_texture_shader_program,"view_matrix");
 	m_lighting_no_texture_shader_projection_matrix_position = glGetUniformLocation(m_lighting_no_texture_shader_program,"projection_matrix");
 	m_lighting_no_texture_shader_camera_position = glGetUniformLocation(m_lighting_no_texture_shader_program,"camera_position");
-	
+        m_lighting_no_texture_shader_light_intensity = glGetUniformLocation(m_lighting_no_texture_shader_program, "lightIntensity");
+        m_lighting_no_texture_shader_light_radius = glGetUniformLocation(m_lighting_no_texture_shader_program, "distance");
+
 	m_quad_shader_texture_1 = glGetUniformLocation(m_quad_shader, "renderedTexture1");
 	m_quad_shader_texture_2 = glGetUniformLocation(m_quad_shader, "renderedTexture2");
+
+        m_lightIntensity = 15.5f;
+        m_radiusLight = 4.8f;
 	
 	//~ Creating the rig
 	glm::vec3 rig_position = glm::vec3(0.0f,0.0f,2.0f);
@@ -144,6 +151,8 @@ void Renderer::render()
 		glUniformMatrix4fv(m_lighting_shader_view_matrix_position, 1, GL_FALSE, glm::value_ptr(m_rig->get_camera_one()->get_view_matrix()));
 		glUniformMatrix4fv(m_lighting_shader_projection_matrix_position, 1, GL_FALSE, glm::value_ptr(m_rig->get_camera_one()->get_projection_matrix()));
 		glUniform3fv(m_lighting_shader_camera_position, GL_FALSE, glm::value_ptr(m_rig->get_camera_one()->get_position()));
+                glUniform1f(m_lighting_shader_light_intensity, m_lightIntensity);
+                glUniform1f(m_lighting_shader_light_radius, m_radiusLight);
 	}
 	else 
 	{
@@ -152,6 +161,8 @@ void Renderer::render()
 		glUniformMatrix4fv(m_lighting_no_texture_shader_view_matrix_position, 1, GL_FALSE, glm::value_ptr(m_rig->get_camera_one()->get_view_matrix()));
 		glUniformMatrix4fv(m_lighting_no_texture_shader_projection_matrix_position, 1, GL_FALSE, glm::value_ptr(m_rig->get_camera_one()->get_projection_matrix()));
 		glUniform3fv(m_lighting_no_texture_shader_camera_position, GL_FALSE, glm::value_ptr(m_rig->get_camera_one()->get_position()));
+                glUniform1f(m_lighting_no_texture_shader_light_intensity, m_lightIntensity);
+                glUniform1f(m_lighting_no_texture_shader_light_radius, m_radiusLight);
 	}
 	
 	//~ Binding vao
@@ -315,6 +326,8 @@ void Renderer::render()
 			int logScroll = 0;
 			imguiBeginScrollArea("Settings", m_width - 210, m_height - 310, 200, 300, &logScroll);
 			imguiSlider("Data", &data, 0.0, 10.0, 0.01);
+                        imguiSlider("Light intensity", &m_lightIntensity, 0.0, 50.0, 0.1);
+                        imguiSlider("Raidius light position", &m_radiusLight, 0.0, 20.0, 0.1);
 			imguiEndScrollArea();
 			imguiEndFrame();
 			imguiRenderGLDraw(m_width, m_height); 

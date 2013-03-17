@@ -91,16 +91,23 @@ class Renderer
 		GLuint m_lighting_shader_projection_matrix_position;
 		GLuint m_lighting_shader_camera_position;
 		GLuint m_lighting_shader_diffuse_texture;
+                GLuint m_lighting_shader_light_intensity;
+                GLuint m_lighting_shader_light_radius;
 		
 		GLuint m_lighting_no_texture_shader_program;
 		GLuint m_lighting_no_texture_shader_model_matrix_position;
 		GLuint m_lighting_no_texture_shader_view_matrix_position;
 		GLuint m_lighting_no_texture_shader_projection_matrix_position;
 		GLuint m_lighting_no_texture_shader_camera_position;
-		
+                GLuint m_lighting_no_texture_shader_light_intensity;
+                GLuint m_lighting_no_texture_shader_light_radius;
+
 		GLuint m_quad_shader;
 		GLuint m_quad_shader_texture_1;
 		GLuint m_quad_shader_texture_2;
+
+                float m_lightIntensity;
+                float m_radiusLight;
 		
 		Framebuffer* m_left_camera_framebuffer;
 		Framebuffer* m_right_camera_framebuffer;
