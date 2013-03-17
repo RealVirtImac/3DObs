@@ -10,45 +10,27 @@ Renderer::Renderer(int width, int height):
 	m_width(width),
 	m_height(height),
 	m_display_gui(true),
-	data(1.0f)
+	m_gui_models_toggle(false),
+	m_gui_textures_toggle(false),
+	m_dc(2.0f),
+	m_selected_model(""),
+	m_selected_texture("")
 {
 	GLenum error;
 	if((error = glewInit()) != GLEW_OK) {
 		throw std::runtime_error((const char*)glewGetErrorString(error));
 	}
 
+	find_available_files((const char*)"models",m_list_of_models);
+	find_available_files((const char*)"textures",m_list_of_textures);
+
 	if (!imguiRenderGLInit("fonts/DroidSans.ttf"))
 	{
 		fprintf(stderr, "Could not init GUI renderer.\n");
 		exit(EXIT_FAILURE);
 	}
-
-	//~ Distance between camera and virtual screen
-	float dc = 2.00f;
-	//~ Loading object
-	try
-	{
-		m_object = new Object("models/frigate.obj","textures/frigate.jpg");
-	}
-	catch(int e)
-	{
-		switch(e)
-		{
-			case 0 : 	std::cout << "3D Model not found" << std::endl;
-						break;
-		}
-	}
-	m_object->set_model_matrix(glm::translate(m_object->get_model_matrix(),glm::vec3(0.00f,0.00f,-dc)));
-
-	float avgDistToBarycentre = m_object->computeAvgDistToBarycentre();
-	float scale = (dc*(2.0f/3.0f))/avgDistToBarycentre;
-	m_object->set_model_matrix(glm::scale(m_object->get_model_matrix(),glm::vec3(scale,scale,scale)));
-
-	glm::vec3 barycentre = m_object->computeBarycentre();
-	barycentre *= scale;
-	m_object->set_model_matrix(glm::translate(m_object->get_model_matrix(),-barycentre));
-
-	m_object->set_model_matrix(glm::rotate(m_object->get_model_matrix(), 90.0f, glm::vec3(0, 1, 0)));
+	
+	//~ load_object(std::string("frigate.obj"),std::string("frigate.jpg"));
 	
 	//~ Loading quads
 	try
@@ -81,28 +63,28 @@ Renderer::Renderer(int width, int height):
 	m_lighting_shader_projection_matrix_position = glGetUniformLocation(m_lighting_shader_program,"projection_matrix");
 	m_lighting_shader_camera_position = glGetUniformLocation(m_lighting_shader_program,"camera_position");
 	m_lighting_shader_diffuse_texture = glGetUniformLocation(m_lighting_shader_program, "diffuse_texture");
-        m_lighting_shader_light_intensity = glGetUniformLocation(m_lighting_shader_program, "lightIntensity");
-        m_lighting_shader_light_radius = glGetUniformLocation(m_lighting_shader_program, "distance");
+	m_lighting_shader_light_intensity = glGetUniformLocation(m_lighting_shader_program, "lightIntensity");
+	m_lighting_shader_light_radius = glGetUniformLocation(m_lighting_shader_program, "distance");
 	
 	m_lighting_no_texture_shader_model_matrix_position = glGetUniformLocation(m_lighting_no_texture_shader_program,"model_matrix");
 	m_lighting_no_texture_shader_view_matrix_position = glGetUniformLocation(m_lighting_no_texture_shader_program,"view_matrix");
 	m_lighting_no_texture_shader_projection_matrix_position = glGetUniformLocation(m_lighting_no_texture_shader_program,"projection_matrix");
 	m_lighting_no_texture_shader_camera_position = glGetUniformLocation(m_lighting_no_texture_shader_program,"camera_position");
-        m_lighting_no_texture_shader_light_intensity = glGetUniformLocation(m_lighting_no_texture_shader_program, "lightIntensity");
-        m_lighting_no_texture_shader_light_radius = glGetUniformLocation(m_lighting_no_texture_shader_program, "distance");
+	m_lighting_no_texture_shader_light_intensity = glGetUniformLocation(m_lighting_no_texture_shader_program, "lightIntensity");
+	m_lighting_no_texture_shader_light_radius = glGetUniformLocation(m_lighting_no_texture_shader_program, "distance");
 
 	m_quad_shader_texture_1 = glGetUniformLocation(m_quad_shader, "renderedTexture1");
 	m_quad_shader_texture_2 = glGetUniformLocation(m_quad_shader, "renderedTexture2");
 
-        m_lightIntensity = 15.5f;
-        m_radiusLight = 4.8f;
+	m_lightIntensity = 15.5f;
+	m_radiusLight = 4.8f;
 	
 	//~ Creating the rig
 	glm::vec3 rig_position = glm::vec3(0.0f,0.0f,2.0f);
 	glm::vec3 rig_up = glm::vec3(0.0f,1.0f,0.0f);
 	glm::vec3 rig_target = glm::vec3(0.0f,0.0f,1.0f);
 	float rig_dioc = 0.065;
-	m_rig = new Rig(rig_position, rig_dioc, dc, rig_up, rig_target, m_width, m_height);
+	m_rig = new Rig(rig_position, rig_dioc, m_dc, rig_up, rig_target, m_width, m_height);
 	
 	//~ Creating the framebuffers
 	m_left_camera_framebuffer = new Framebuffer(1,m_width,m_height);
@@ -132,209 +114,250 @@ void Renderer::render()
 {
 	glClearColor(0.0,0.0,0.0,1.0);
 	glEnable(GL_DEPTH_TEST);
-	
-	//~ ------------------------------------------------------------------------------------------------------------
-	//~ Rendering the first camera
-	//~ ------------------------------------------------------------------------------------------------------------
-	glBindFramebuffer(GL_FRAMEBUFFER, m_left_camera_framebuffer->get_framebuffer_id());
-	glClearColor(0.0,0.0,0.0,1.0);
-	glViewport(0, 0, m_width, m_height);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	//~ Choosing shader
-	if(m_object->get_texture_path() != NULL)
+	//~ UI
+	if(m_display_gui)
 	{
-		glUseProgram(m_lighting_shader_program);
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, m_object->get_diffuse_texture());
-		glUniform1i(m_lighting_shader_diffuse_texture, 0);
-		glUniformMatrix4fv(m_lighting_shader_model_matrix_position, 1, GL_FALSE, glm::value_ptr(m_object->get_model_matrix()));
-		glUniformMatrix4fv(m_lighting_shader_view_matrix_position, 1, GL_FALSE, glm::value_ptr(m_rig->get_camera_one()->get_view_matrix()));
-		glUniformMatrix4fv(m_lighting_shader_projection_matrix_position, 1, GL_FALSE, glm::value_ptr(m_rig->get_camera_one()->get_projection_matrix()));
-		glUniform3fv(m_lighting_shader_camera_position, GL_FALSE, glm::value_ptr(m_rig->get_camera_one()->get_position()));
-                glUniform1f(m_lighting_shader_light_intensity, m_lightIntensity);
-                glUniform1f(m_lighting_shader_light_radius, m_radiusLight);
-	}
-	else 
-	{
-		glUseProgram(m_lighting_no_texture_shader_program);
-		glUniformMatrix4fv(m_lighting_no_texture_shader_model_matrix_position, 1, GL_FALSE, glm::value_ptr(m_object->get_model_matrix()));
-		glUniformMatrix4fv(m_lighting_no_texture_shader_view_matrix_position, 1, GL_FALSE, glm::value_ptr(m_rig->get_camera_one()->get_view_matrix()));
-		glUniformMatrix4fv(m_lighting_no_texture_shader_projection_matrix_position, 1, GL_FALSE, glm::value_ptr(m_rig->get_camera_one()->get_projection_matrix()));
-		glUniform3fv(m_lighting_no_texture_shader_camera_position, GL_FALSE, glm::value_ptr(m_rig->get_camera_one()->get_position()));
-                glUniform1f(m_lighting_no_texture_shader_light_intensity, m_lightIntensity);
-                glUniform1f(m_lighting_no_texture_shader_light_radius, m_radiusLight);
-	}
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glViewport(0, 0, m_width, m_height);
+		glDisable(GL_DEPTH_TEST);
 	
-	//~ Binding vao
-	glBindVertexArray(m_object->get_vao());
-	//~ Drawing
-	glDrawArrays(GL_TRIANGLES, 0, m_object->get_size());
+		unsigned char mbut = 0;
+		int mscroll = 0;
+		int mousex; int mousey;
+		SDL_GetMouseState(&mousex, &mousey);
+		mousey = m_height - mousey;
 
-	//~ Unbind
-	glBindVertexArray(0);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	
-	//~ ------------------------------------------------------------------------------------------------------------
-	//~ Rendering the second camera
-	//~ ------------------------------------------------------------------------------------------------------------
-	glBindFramebuffer(GL_FRAMEBUFFER, m_right_camera_framebuffer->get_framebuffer_id());
-	glClearColor(0.0,0.0,0.0,1.0);
-	glViewport(0, 0, m_width, m_height);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	//~ Choosing shader
-	if(m_object->get_texture_path() != NULL)
-	{
-		glUseProgram(m_lighting_shader_program);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, m_object->get_diffuse_texture());
-		glUniform1i(m_lighting_shader_diffuse_texture, 0);
-		glUniformMatrix4fv(m_lighting_shader_model_matrix_position, 1, GL_FALSE, glm::value_ptr(m_object->get_model_matrix()));
-		glUniformMatrix4fv(m_lighting_shader_view_matrix_position, 1, GL_FALSE, glm::value_ptr(m_rig->get_camera_two()->get_view_matrix()));
-		glUniformMatrix4fv(m_lighting_shader_projection_matrix_position, 1, GL_FALSE, glm::value_ptr(m_rig->get_camera_two()->get_projection_matrix()));
-		glUniform3fv(m_lighting_shader_camera_position, GL_FALSE, glm::value_ptr(m_rig->get_camera_two()->get_position()));
-	}
-	else 
-	{
-		glUseProgram(m_lighting_no_texture_shader_program);
-		glUniformMatrix4fv(m_lighting_no_texture_shader_model_matrix_position, 1, GL_FALSE, glm::value_ptr(m_object->get_model_matrix()));
-		glUniformMatrix4fv(m_lighting_no_texture_shader_view_matrix_position, 1, GL_FALSE, glm::value_ptr(m_rig->get_camera_two()->get_view_matrix()));
-		glUniformMatrix4fv(m_lighting_no_texture_shader_projection_matrix_position, 1, GL_FALSE, glm::value_ptr(m_rig->get_camera_two()->get_projection_matrix()));
-		glUniform3fv(m_lighting_no_texture_shader_camera_position, GL_FALSE, glm::value_ptr(m_rig->get_camera_two()->get_position()));
-	}
-	
-	//~ Binding vao
-	glBindVertexArray(m_object->get_vao());
-	//~ Drawing
-	glDrawArrays(GL_TRIANGLES, 0, m_object->get_size());
+		if(SDL_GetMouseState(NULL, NULL)&SDL_BUTTON(1)) mbut |= IMGUI_MBUT_LEFT;
 
-	//~ Unbind
-	glBindVertexArray(0);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	
-	//~ ------------------------------------------------------------------------------------------------------------
-	//~ Rendering the final view
-	//~ ------------------------------------------------------------------------------------------------------------
-
-        //~ //Anaglyph
-        if (m_view_mode == 0)
-        {
-            glClearColor(0.0,0.0,0.0,1.0);
-            glViewport(0, 0, m_width, m_height);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            //~ //Choosing shader
-            glUseProgram(m_quad_shader);
-            //~ //Sending uniforms
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, m_left_camera_framebuffer->get_texture_color_id()[0]);
-            glUniform1i(m_quad_shader_texture_1, 0);
-            glActiveTexture(GL_TEXTURE1);
-            glBindTexture(GL_TEXTURE_2D, m_right_camera_framebuffer->get_texture_color_id()[0]);
-            glUniform1i(m_quad_shader_texture_2, 1);
-            glUniformMatrix4fv(m_lighting_shader_model_matrix_position, 1, GL_FALSE, glm::value_ptr(m_quad_left->get_model_matrix()));
-            glUniformMatrix4fv(m_lighting_shader_view_matrix_position, 1, GL_FALSE, glm::value_ptr(m_rig->get_camera_two()->get_view_matrix()));
-            glUniformMatrix4fv(m_lighting_shader_projection_matrix_position, 1, GL_FALSE, glm::value_ptr(glm::perspective(
-                    m_rig->get_camera_two()->get_fov(),
-                    m_rig->get_camera_two()->get_ratio(),
-                    m_rig->get_camera_two()->get_near(),
-                    m_rig->get_camera_two()->get_far())));
-            glUniform3fv(m_lighting_shader_camera_position, GL_FALSE, glm::value_ptr(m_rig->get_position()));
-            //~ //Binding vao
-            glBindVertexArray(m_quad_left->get_vao());
-            //~ //Drawing
-            glDrawArrays(GL_TRIANGLES, 0, m_quad_left->get_size());
-            //~ //Unbind
-            glBindVertexArray(0);
-        }
-        //~ //Side by side
-        else if(m_view_mode == 1)
-        {
-            //~ //Left view
-            glClearColor(0.0,0.0,0.0,1.0);
-            glViewport(0, 0, m_width/2, m_height);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            //~ //Choosing shader
-            glUseProgram(m_quad_shader);
-            //~ //Sending uniforms
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, m_left_camera_framebuffer->get_texture_color_id()[0]);
-            glUniform1i(m_quad_shader_texture_1, 0);
-            glActiveTexture(GL_TEXTURE1);
-            glBindTexture(GL_TEXTURE_2D, m_left_camera_framebuffer->get_texture_color_id()[0]);
-            glUniform1i(m_quad_shader_texture_2, 1);
-            glUniformMatrix4fv(m_lighting_shader_model_matrix_position, 1, GL_FALSE, glm::value_ptr(m_quad_left->get_model_matrix()));
-            glUniformMatrix4fv(m_lighting_shader_view_matrix_position, 1, GL_FALSE, glm::value_ptr(m_rig->get_camera_two()->get_view_matrix()));
-            glUniformMatrix4fv(m_lighting_shader_projection_matrix_position, 1, GL_FALSE, glm::value_ptr(glm::perspective(
-                    m_rig->get_camera_two()->get_fov(),
-                    m_rig->get_camera_two()->get_ratio(),
-                    m_rig->get_camera_two()->get_near(),
-                    m_rig->get_camera_two()->get_far())));
-            glUniform3fv(m_lighting_shader_camera_position, GL_FALSE, glm::value_ptr(m_rig->get_position()));
-            //~ //Binding vao
-            glBindVertexArray(m_quad_left->get_vao());
-            //~ //Drawing
-            glDrawArrays(GL_TRIANGLES, 0, m_quad_left->get_size());
-            //~ //Unbind
-            glBindVertexArray(0);
-
-            //~ //Right view
-            glClearColor(0.0,0.0,0.0,1.0);
-            glViewport(m_width/2, 0, m_width/2, m_height);
-            //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            //~ //Choosing shader
-            glUseProgram(m_quad_shader);
-            //~ //Sending uniforms
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, m_right_camera_framebuffer->get_texture_color_id()[0]);
-            glUniform1i(m_quad_shader_texture_1, 0);
-            glActiveTexture(GL_TEXTURE1);
-            glBindTexture(GL_TEXTURE_2D, m_right_camera_framebuffer->get_texture_color_id()[0]);
-            glUniform1i(m_quad_shader_texture_2, 1);
-            glUniformMatrix4fv(m_lighting_shader_model_matrix_position, 1, GL_FALSE, glm::value_ptr(m_quad_right->get_model_matrix()));
-            glUniformMatrix4fv(m_lighting_shader_view_matrix_position, 1, GL_FALSE, glm::value_ptr(m_rig->get_camera_two()->get_view_matrix()));
-            glUniformMatrix4fv(m_lighting_shader_projection_matrix_position, 1, GL_FALSE, glm::value_ptr(glm::perspective(
-                    m_rig->get_camera_two()->get_fov(),
-                    m_rig->get_camera_two()->get_ratio(),
-                    m_rig->get_camera_two()->get_near(),
-                    m_rig->get_camera_two()->get_far())));
-            glUniform3fv(m_lighting_shader_camera_position, GL_FALSE, glm::value_ptr(m_rig->get_position()));
-            //~ //Binding vao
-            glBindVertexArray(m_quad_right->get_vao());
-            //~ //Drawing
-            glDrawArrays(GL_TRIANGLES, 0, m_quad_right->get_size());
-            //~ //Unbind
-            glBindVertexArray(0);
-        }
-        
-        //~ UI
-		if(m_display_gui)
+		imguiBeginFrame(mousex, mousey, mbut, mscroll);
+		int logScroll = 0;
+		imguiBeginScrollArea("Settings",10,0, 200, m_height, &logScroll);
+		imguiSlider("Light intensity", &m_lightIntensity, 0.0, 50.0, 0.1);
+		imguiSlider("Radius light position", &m_radiusLight, 0.0, 20.0, 0.1);
+		m_toggle = imguiCollapse("Models", "", m_gui_models_toggle);
+		if (m_gui_models_toggle)
 		{
-			glActiveTexture(GL_TEXTURE0);
-			glEnable(GL_BLEND);
-			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-			glViewport(0, 0, m_width, m_height);
-			glDisable(GL_DEPTH_TEST);
-        
-			unsigned char mbut = 0;
-			int mscroll = 0;
-			int mousex; int mousey;
-			SDL_GetMouseState(&mousex, &mousey);
-			mousey = m_height - mousey;
-
-			if(SDL_GetMouseState(NULL, NULL)&SDL_BUTTON(1)) mbut |= IMGUI_MBUT_LEFT;
-
-			imguiBeginFrame(mousex, mousey, mbut, mscroll);
-			int logScroll = 0;
-			imguiBeginScrollArea("Settings", m_width - 210, m_height - 310, 200, 300, &logScroll);
-			imguiSlider("Data", &data, 0.0, 10.0, 0.01);
-                        imguiSlider("Light intensity", &m_lightIntensity, 0.0, 50.0, 0.1);
-                        imguiSlider("Raidius light position", &m_radiusLight, 0.0, 20.0, 0.1);
-			imguiEndScrollArea();
-			imguiEndFrame();
-			imguiRenderGLDraw(m_width, m_height); 
-
-			glDisable(GL_BLEND);
-			glEnable(GL_DEPTH_TEST);
+			imguiIndent();
+			for(std::vector<std::string>::iterator it = m_list_of_models.begin(); it!=m_list_of_models.end(); ++it)
+			{
+				int res = imguiButton((*it).c_str());
+				if(res) 
+				{
+					m_selected_model = *it;
+					if(m_selected_model != "" && m_selected_texture != "")
+					{
+						load_object(m_selected_model,m_selected_texture);
+					}
+				}
+			}
+			imguiUnindent();
 		}
+		if(m_toggle) m_gui_models_toggle = !m_gui_models_toggle;
+		m_toggle = imguiCollapse("Textures", "", m_gui_textures_toggle);
+		if (m_gui_textures_toggle)
+		{
+			imguiIndent();
+			for(std::vector<std::string>::iterator it = m_list_of_textures.begin(); it!=m_list_of_textures.end(); ++it)
+			{
+				int res = imguiButton((*it).c_str());
+				if(res) 
+				{
+					m_selected_texture = *it;
+					if(m_selected_model != "" && m_selected_texture != "")
+					{
+						load_object(m_selected_model,m_selected_texture);
+					}
+				}
+			}
+			imguiUnindent();
+		}
+		if(m_toggle) m_gui_textures_toggle = !m_gui_textures_toggle;
+		imguiEndScrollArea();
+		imguiEndFrame();
+		imguiRenderGLDraw(m_width, m_height); 
+
+		glDisable(GL_BLEND);
+		glEnable(GL_DEPTH_TEST);
+	}
+	else
+	{
+		if(m_object != NULL)
+		{
+		//~ ------------------------------------------------------------------------------------------------------------
+		//~ Rendering the first camera
+		//~ ------------------------------------------------------------------------------------------------------------
+		glBindFramebuffer(GL_FRAMEBUFFER, m_left_camera_framebuffer->get_framebuffer_id());
+		glClearColor(0.0,0.0,0.0,1.0);
+		glViewport(0, 0, m_width, m_height);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		//~ Choosing shader
+		if(m_object->get_texture_path() != NULL)
+		{
+			glUseProgram(m_lighting_shader_program);
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, m_object->get_diffuse_texture());
+			glUniform1i(m_lighting_shader_diffuse_texture, 0);
+			glUniformMatrix4fv(m_lighting_shader_model_matrix_position, 1, GL_FALSE, glm::value_ptr(m_object->get_model_matrix()));
+			glUniformMatrix4fv(m_lighting_shader_view_matrix_position, 1, GL_FALSE, glm::value_ptr(m_rig->get_camera_one()->get_view_matrix()));
+			glUniformMatrix4fv(m_lighting_shader_projection_matrix_position, 1, GL_FALSE, glm::value_ptr(m_rig->get_camera_one()->get_projection_matrix()));
+			glUniform3fv(m_lighting_shader_camera_position, GL_FALSE, glm::value_ptr(m_rig->get_camera_one()->get_position()));
+			glUniform1f(m_lighting_shader_light_intensity, m_lightIntensity);
+			glUniform1f(m_lighting_shader_light_radius, m_radiusLight);
+		}
+		else 
+		{
+			glUseProgram(m_lighting_no_texture_shader_program);
+			glUniformMatrix4fv(m_lighting_no_texture_shader_model_matrix_position, 1, GL_FALSE, glm::value_ptr(m_object->get_model_matrix()));
+			glUniformMatrix4fv(m_lighting_no_texture_shader_view_matrix_position, 1, GL_FALSE, glm::value_ptr(m_rig->get_camera_one()->get_view_matrix()));
+			glUniformMatrix4fv(m_lighting_no_texture_shader_projection_matrix_position, 1, GL_FALSE, glm::value_ptr(m_rig->get_camera_one()->get_projection_matrix()));
+			glUniform3fv(m_lighting_no_texture_shader_camera_position, GL_FALSE, glm::value_ptr(m_rig->get_camera_one()->get_position()));
+			glUniform1f(m_lighting_no_texture_shader_light_intensity, m_lightIntensity);
+			glUniform1f(m_lighting_no_texture_shader_light_radius, m_radiusLight);
+		}
+		
+		//~ Binding vao
+		glBindVertexArray(m_object->get_vao());
+		//~ Drawing
+		glDrawArrays(GL_TRIANGLES, 0, m_object->get_size());
+
+		//~ Unbind
+		glBindVertexArray(0);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		
+		//~ ------------------------------------------------------------------------------------------------------------
+		//~ Rendering the second camera
+		//~ ------------------------------------------------------------------------------------------------------------
+		glBindFramebuffer(GL_FRAMEBUFFER, m_right_camera_framebuffer->get_framebuffer_id());
+		glClearColor(0.0,0.0,0.0,1.0);
+		glViewport(0, 0, m_width, m_height);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		//~ Choosing shader
+		if(m_object->get_texture_path() != NULL)
+		{
+			glUseProgram(m_lighting_shader_program);
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, m_object->get_diffuse_texture());
+			glUniform1i(m_lighting_shader_diffuse_texture, 0);
+			glUniformMatrix4fv(m_lighting_shader_model_matrix_position, 1, GL_FALSE, glm::value_ptr(m_object->get_model_matrix()));
+			glUniformMatrix4fv(m_lighting_shader_view_matrix_position, 1, GL_FALSE, glm::value_ptr(m_rig->get_camera_two()->get_view_matrix()));
+			glUniformMatrix4fv(m_lighting_shader_projection_matrix_position, 1, GL_FALSE, glm::value_ptr(m_rig->get_camera_two()->get_projection_matrix()));
+			glUniform3fv(m_lighting_shader_camera_position, GL_FALSE, glm::value_ptr(m_rig->get_camera_two()->get_position()));
+		}
+		else 
+		{
+			glUseProgram(m_lighting_no_texture_shader_program);
+			glUniformMatrix4fv(m_lighting_no_texture_shader_model_matrix_position, 1, GL_FALSE, glm::value_ptr(m_object->get_model_matrix()));
+			glUniformMatrix4fv(m_lighting_no_texture_shader_view_matrix_position, 1, GL_FALSE, glm::value_ptr(m_rig->get_camera_two()->get_view_matrix()));
+			glUniformMatrix4fv(m_lighting_no_texture_shader_projection_matrix_position, 1, GL_FALSE, glm::value_ptr(m_rig->get_camera_two()->get_projection_matrix()));
+			glUniform3fv(m_lighting_no_texture_shader_camera_position, GL_FALSE, glm::value_ptr(m_rig->get_camera_two()->get_position()));
+		}
+		
+		//~ Binding vao
+		glBindVertexArray(m_object->get_vao());
+		//~ Drawing
+		glDrawArrays(GL_TRIANGLES, 0, m_object->get_size());
+
+		//~ Unbind
+		glBindVertexArray(0);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		
+		//~ ------------------------------------------------------------------------------------------------------------
+		//~ Rendering the final view
+		//~ ------------------------------------------------------------------------------------------------------------
+
+			//~ //Anaglyph
+			if (m_view_mode == 0)
+			{
+				glClearColor(0.0,0.0,0.0,1.0);
+				glViewport(0, 0, m_width, m_height);
+				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+				//~ //Choosing shader
+				glUseProgram(m_quad_shader);
+				//~ //Sending uniforms
+				glActiveTexture(GL_TEXTURE0);
+				glBindTexture(GL_TEXTURE_2D, m_left_camera_framebuffer->get_texture_color_id()[0]);
+				glUniform1i(m_quad_shader_texture_1, 0);
+				glActiveTexture(GL_TEXTURE1);
+				glBindTexture(GL_TEXTURE_2D, m_right_camera_framebuffer->get_texture_color_id()[0]);
+				glUniform1i(m_quad_shader_texture_2, 1);
+				glUniformMatrix4fv(m_lighting_shader_model_matrix_position, 1, GL_FALSE, glm::value_ptr(m_quad_left->get_model_matrix()));
+				glUniformMatrix4fv(m_lighting_shader_view_matrix_position, 1, GL_FALSE, glm::value_ptr(m_rig->get_camera_two()->get_view_matrix()));
+				glUniformMatrix4fv(m_lighting_shader_projection_matrix_position, 1, GL_FALSE, glm::value_ptr(glm::perspective(
+						m_rig->get_camera_two()->get_fov(),
+						m_rig->get_camera_two()->get_ratio(),
+						m_rig->get_camera_two()->get_near(),
+						m_rig->get_camera_two()->get_far())));
+				glUniform3fv(m_lighting_shader_camera_position, GL_FALSE, glm::value_ptr(m_rig->get_position()));
+				//~ //Binding vao
+				glBindVertexArray(m_quad_left->get_vao());
+				//~ //Drawing
+				glDrawArrays(GL_TRIANGLES, 0, m_quad_left->get_size());
+				//~ //Unbind
+				glBindVertexArray(0);
+			}
+			//~ //Side by side
+			else if(m_view_mode == 1)
+			{
+				//~ //Left view
+				glClearColor(0.0,0.0,0.0,1.0);
+				glViewport(0, 0, m_width/2, m_height);
+				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+				//~ //Choosing shader
+				glUseProgram(m_quad_shader);
+				//~ //Sending uniforms
+				glActiveTexture(GL_TEXTURE0);
+				glBindTexture(GL_TEXTURE_2D, m_left_camera_framebuffer->get_texture_color_id()[0]);
+				glUniform1i(m_quad_shader_texture_1, 0);
+				glActiveTexture(GL_TEXTURE1);
+				glBindTexture(GL_TEXTURE_2D, m_left_camera_framebuffer->get_texture_color_id()[0]);
+				glUniform1i(m_quad_shader_texture_2, 1);
+				glUniformMatrix4fv(m_lighting_shader_model_matrix_position, 1, GL_FALSE, glm::value_ptr(m_quad_left->get_model_matrix()));
+				glUniformMatrix4fv(m_lighting_shader_view_matrix_position, 1, GL_FALSE, glm::value_ptr(m_rig->get_camera_two()->get_view_matrix()));
+				glUniformMatrix4fv(m_lighting_shader_projection_matrix_position, 1, GL_FALSE, glm::value_ptr(glm::perspective(
+						m_rig->get_camera_two()->get_fov(),
+						m_rig->get_camera_two()->get_ratio(),
+						m_rig->get_camera_two()->get_near(),
+						m_rig->get_camera_two()->get_far())));
+				glUniform3fv(m_lighting_shader_camera_position, GL_FALSE, glm::value_ptr(m_rig->get_position()));
+				//~ //Binding vao
+				glBindVertexArray(m_quad_left->get_vao());
+				//~ //Drawing
+				glDrawArrays(GL_TRIANGLES, 0, m_quad_left->get_size());
+				//~ //Unbind
+				glBindVertexArray(0);
+
+				//~ //Right view
+				glClearColor(0.0,0.0,0.0,1.0);
+				glViewport(m_width/2, 0, m_width/2, m_height);
+				//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+				//~ //Choosing shader
+				glUseProgram(m_quad_shader);
+				//~ //Sending uniforms
+				glActiveTexture(GL_TEXTURE0);
+				glBindTexture(GL_TEXTURE_2D, m_right_camera_framebuffer->get_texture_color_id()[0]);
+				glUniform1i(m_quad_shader_texture_1, 0);
+				glActiveTexture(GL_TEXTURE1);
+				glBindTexture(GL_TEXTURE_2D, m_right_camera_framebuffer->get_texture_color_id()[0]);
+				glUniform1i(m_quad_shader_texture_2, 1);
+				glUniformMatrix4fv(m_lighting_shader_model_matrix_position, 1, GL_FALSE, glm::value_ptr(m_quad_right->get_model_matrix()));
+				glUniformMatrix4fv(m_lighting_shader_view_matrix_position, 1, GL_FALSE, glm::value_ptr(m_rig->get_camera_two()->get_view_matrix()));
+				glUniformMatrix4fv(m_lighting_shader_projection_matrix_position, 1, GL_FALSE, glm::value_ptr(glm::perspective(
+						m_rig->get_camera_two()->get_fov(),
+						m_rig->get_camera_two()->get_ratio(),
+						m_rig->get_camera_two()->get_near(),
+						m_rig->get_camera_two()->get_far())));
+				glUniform3fv(m_lighting_shader_camera_position, GL_FALSE, glm::value_ptr(m_rig->get_position()));
+				//~ //Binding vao
+				glBindVertexArray(m_quad_right->get_vao());
+				//~ //Drawing
+				glDrawArrays(GL_TRIANGLES, 0, m_quad_right->get_size());
+				//~ //Unbind
+				glBindVertexArray(0);
+			}
+		}
+	}
 }
 
 const char* Renderer::readFile(const char* filePath) {
@@ -439,6 +462,73 @@ GLuint Renderer::loadProgram(const char* vertexShaderFile, const char* fragmentS
     delete [] fragmentShaderSource;
 
     return program;
+}
+
+void Renderer::find_available_files(const char* directory,std::vector<std::string> &container)
+{
+	struct dirent* file = NULL;
+	DIR* rep = opendir(directory);
+	
+	if(rep == NULL)
+	{
+		exit(1);
+	}
+	
+	while((file = readdir(rep))!=NULL)
+	{
+		if (strcmp(file->d_name, "." ) != 0 && strcmp(file->d_name, ".." ) != 0)
+		{
+			container.push_back(file->d_name);
+		}
+	}
+	
+	for(std::vector<std::string>::iterator it = container.begin(); it!=container.end(); ++it)
+	{
+		iter_swap(it, min_element(it, container.end()));
+	}
+	
+	if(closedir(rep) == -1)
+	{
+		exit(-1);
+	}
+}
+
+void Renderer::load_object(const std::string model,const std::string texture)
+{
+	if(m_object != NULL) 
+	{
+		delete m_object;
+	}
+	//~ Loading object
+	std::string m = "models/";
+	m += model;
+	
+	std::string t = "textures/";
+	t += texture;
+	
+	try
+	{
+		m_object = new Object(m.c_str(),t.c_str());
+	}
+	catch(int e)
+	{
+		switch(e)
+		{
+			case 0 : 	std::cout << "3D Model not found" << std::endl;
+						break;
+		}
+	}
+	m_object->set_model_matrix(glm::translate(m_object->get_model_matrix(),glm::vec3(0.00f,0.00f,-m_dc)));
+
+	float avgDistToBarycentre = m_object->computeAvgDistToBarycentre();
+	float scale = (m_dc*(2.0f/3.0f))/avgDistToBarycentre;
+	m_object->set_model_matrix(glm::scale(m_object->get_model_matrix(),glm::vec3(scale,scale,scale)));
+
+	glm::vec3 barycentre = m_object->computeBarycentre();
+	barycentre *= scale;
+	m_object->set_model_matrix(glm::translate(m_object->get_model_matrix(),-barycentre));
+
+	m_object->set_model_matrix(glm::rotate(m_object->get_model_matrix(), 90.0f, glm::vec3(0, 1, 0)));
 }
 
 //~ Getters

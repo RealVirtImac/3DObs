@@ -13,6 +13,8 @@
 #include <string>
 #include <fstream>
 #include <SDL/SDL.h>
+#include <dirent.h>
+#include <vector>
 
 #include "glm/glm.hpp"
 #include "glm/gtc/type_ptr.hpp"
@@ -38,9 +40,22 @@ class Renderer
 		//! Destructor
 		~Renderer();
 		
-		//! Render the scene thanks to the two cameras and the framebuffers
+		//! Renders the scene thanks to the two cameras and the framebuffers
 		void render();
-		
+		//! Finds all the available files in a directory
+		/*!
+		 * Finds all the available files in a directory using a specific pattern
+		 * \param directory The directory where the search will be made
+		 * \param container The container where the names of the files will be stored
+		 */ 
+		void find_available_files(const char* directory,std::vector<std::string> &container);
+		//! Loads an object in the renderer
+		/*!
+		 * Loads an object in the renderer
+		 * \param model The model to load
+		 * \param texture The texture to load
+		 */ 
+		void load_object(const std::string model,const std::string texture);
 		//! Gets the rig maintaining the two cameras
 		/*!
 		 * \return The rig
@@ -91,28 +106,39 @@ class Renderer
 		GLuint m_lighting_shader_projection_matrix_position;
 		GLuint m_lighting_shader_camera_position;
 		GLuint m_lighting_shader_diffuse_texture;
-                GLuint m_lighting_shader_light_intensity;
-                GLuint m_lighting_shader_light_radius;
+		GLuint m_lighting_shader_light_intensity;
+		GLuint m_lighting_shader_light_radius;
 		
 		GLuint m_lighting_no_texture_shader_program;
 		GLuint m_lighting_no_texture_shader_model_matrix_position;
 		GLuint m_lighting_no_texture_shader_view_matrix_position;
 		GLuint m_lighting_no_texture_shader_projection_matrix_position;
 		GLuint m_lighting_no_texture_shader_camera_position;
-                GLuint m_lighting_no_texture_shader_light_intensity;
-                GLuint m_lighting_no_texture_shader_light_radius;
+		GLuint m_lighting_no_texture_shader_light_intensity;
+		GLuint m_lighting_no_texture_shader_light_radius;
 
 		GLuint m_quad_shader;
 		GLuint m_quad_shader_texture_1;
 		GLuint m_quad_shader_texture_2;
 
-                float m_lightIntensity;
-                float m_radiusLight;
+		float m_lightIntensity;
+		float m_radiusLight;
 		
 		Framebuffer* m_left_camera_framebuffer;
 		Framebuffer* m_right_camera_framebuffer;
 		
 		bool m_display_gui;
 		
-		float data;
+		std::vector<std::string> m_list_of_models;
+		std::vector<std::string> m_list_of_textures;
+		
+		bool m_gui_models_toggle;
+		bool m_gui_textures_toggle;
+		int m_toggle;
+		
+		//~ Distance between camera and virtual screen
+		float m_dc;
+		
+		std::string m_selected_model;
+		std::string m_selected_texture;
 };
