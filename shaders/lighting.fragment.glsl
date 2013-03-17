@@ -31,9 +31,7 @@ void main(void)
 	vec3 diffuse = texture(diffuse_texture, uv).rgb;
 	
 	vec3  lightColor = vec3(1.0, 1.0, 1.0);
-        //float lightIntensity = 15.5;
 	float specular = 0;
-        //float distance = 4.8;
 	
 	vec3  lightPosition = vec3(distance, distance, distance);
         vec3 pl1 = PointLight(lightPosition,lightColor,lightIntensity,specular, n, diffuse);
