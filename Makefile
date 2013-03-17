@@ -6,9 +6,9 @@ EXEC = 3DObs
 all:	$(EXEC)
 	
 
-$(EXEC): bin/Application.o bin/Object.o bin/Renderer.o bin/Camera.o bin/Rig.o bin/Framebuffer.o bin/stb_image.o bin/main.o
+$(EXEC): bin/Application.o bin/Object.o bin/Renderer.o bin/Camera.o bin/Rig.o bin/Framebuffer.o bin/stb_image.o bin/imgui.o bin/imguiRenderGL.o bin/main.o
 	@echo "\033[33;33m \t Linking \033[m\017" 
-	@$(CXX) -o $(EXEC) bin/Application.o bin/Object.o bin/Renderer.o bin/Camera.o bin/Rig.o bin/Framebuffer.o bin/stb_image.o bin/main.o $(CFLAGS) $(LDFLAGS)
+	@$(CXX) -o $(EXEC) bin/Application.o bin/Object.o bin/Renderer.o bin/Camera.o bin/Rig.o bin/Framebuffer.o bin/stb_image.o bin/imgui.o bin/imguiRenderGL.o bin/main.o $(CFLAGS) $(LDFLAGS)
 	@echo "\033[33;34m \t Done : type : ./3DObs to run \033[m\017"
 
 bin/Application.o: src/Application.cpp include/Application.hpp
@@ -41,6 +41,16 @@ bin/stb_image.o: include/stb_image/stb_image.c include/stb_image/stb_image.h
 	@echo "\033[33;32m \t Compiling" $< "\033[m\017" 
 	@$(CXX) -c include/stb_image/stb_image.c $(CFLAGS) -Wno-missing-field-initializers -Wno-unused-but-set-variable
 	@mv stb_image.o bin/
+	
+bin/imgui.o: include/imgui/imgui.cpp include/imgui/imgui.h
+	@echo "\033[33;32m \t Compiling" $< "\033[m\017" 
+	@$(CXX) -c include/imgui/imgui.cpp $(CFLAGS)
+	@mv imgui.o bin/
+
+bin/imguiRenderGL.o: include/imgui/imguiRenderGL.cpp include/imgui/imguiRenderGL.h
+	@echo "\033[33;32m \t Compiling" $< "\033[m\017" 
+	@$(CXX) -c include/imgui/imguiRenderGL.cpp $(CFLAGS) -Wno-unused-but-set-variable
+	@mv imguiRenderGL.o bin/
 	
 bin/Framebuffer.o: src/Framebuffer.cpp include/Framebuffer.hpp
 	@echo "\033[33;32m \t Compiling" $< "\033[m\017" 

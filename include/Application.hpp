@@ -65,4 +65,6 @@ class Application
 		SDL_Joystick* m_joystick;
 		
 		std::vector<bool> m_input_keys;
+		
+		bool m_display_gui;
 };

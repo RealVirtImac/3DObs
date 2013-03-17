@@ -23,15 +23,13 @@ class Rig
 	public:
 		//! Constructor
 		/*!
-		 * \param camera_one The first camera
-		 * \param camera_two The second camera
 		 * \param position The position of the rig
 		 * \param up The up vector of the rig
 		 * \param target The target vector of the rig
 		 * \param width The width of the window
 		 * \param height The height of the window
 		 */ 
-		Rig(Camera* camera_one, Camera* camera_two, glm::vec3 position, float dioc, float dc, glm::vec3 up, glm::vec3 target, int width, int height);
+		Rig(glm::vec3 position, float dioc, float dc, glm::vec3 up, glm::vec3 target, int width, int height);
 		//! Destructor
 		~Rig();
 		
@@ -79,7 +77,16 @@ class Rig
 		 * \return The target of the rig
 		 */ 
 		glm::vec3 get_target() const;
-		
+		//! Gets the first camera
+		/*!
+		 * \return The first camera
+		 */ 
+		Camera* get_camera_one() const;
+		//! Gets the second camera
+		/*!
+		 * \return The second camera
+		 */ 
+		Camera* get_camera_two() const;
 	private:
 		Camera* m_camera_one;
 		Camera* m_camera_two;

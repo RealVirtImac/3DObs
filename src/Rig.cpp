@@ -6,9 +6,7 @@
 
 #include "../include/Rig.hpp"
 
-Rig::Rig(Camera* camera_one, Camera* camera_two, glm::vec3 position, float dioc, float dc, glm::vec3 up, glm::vec3 target, int width, int height):
-	m_camera_one(camera_one),
-	m_camera_two(camera_two),
+Rig::Rig(glm::vec3 position, float dioc, float dc, glm::vec3 up, glm::vec3 target, int width, int height):
 	m_position(position),
 	m_up(up),
 	m_target(target),
@@ -19,25 +17,32 @@ Rig::Rig(Camera* camera_one, Camera* camera_two, glm::vec3 position, float dioc,
 	m_width(width),
 	m_height(height)
 {
+	m_camera_one = new Camera(m_width,m_height, dc*(2.0f/3.0f), 0);
+	m_camera_two = new Camera(m_width,m_height, dc*(2.0f/3.0f), 1);
+	
 	m_camera_one->set_dioc(dioc);
 	m_camera_two->set_dioc(dioc);
-
-	m_camera_one->set_target(m_target);
-	m_camera_two->set_target(m_target);
 	
 	m_camera_one->set_up(m_up);
 	m_camera_two->set_up(m_up);
-
-        m_camera_one->compute_projection_matrix(dc);
-        m_camera_two->compute_projection_matrix(dc);
-
-	m_camera_one->set_position(m_position);
-	m_camera_two->set_position(m_position);
+	
+	update_horizontal_angle(m_width/2);
+	update_vertical_angle(m_height/2);
+	update_target();
+	
+	glm::vec3 orthogonal_vector = glm::normalize(glm::cross(m_up,m_target));
+	glm::vec3 displacement = (m_camera_one->get_dioc()/2)*orthogonal_vector;
+	m_camera_one->set_position(m_position - displacement);
+	m_camera_two->set_position(m_position + displacement);
+	
+	m_camera_one->compute_projection_matrix(dc);
+	m_camera_two->compute_projection_matrix(dc);
 }
-
 
 Rig::~Rig()
 {
+	delete m_camera_one;
+	delete m_camera_two;
 }
 
 void Rig::update_position(const int direction, const float delta)
@@ -152,4 +157,14 @@ void Rig::set_target(const glm::vec3 target)
 glm::vec3 Rig::get_target() const
 {
 	return m_target;
+}
+
+Camera* Rig::get_camera_one() const
+{
+	return m_camera_one;
+}
+
+Camera* Rig::get_camera_two() const
+{
+	return m_camera_two;
 }

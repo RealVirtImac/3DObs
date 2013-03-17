@@ -25,7 +25,7 @@ class Camera
 		 * \param height Height of the window
 		 * \param type 1 if we are considering the left camera, 0 otherwise 
 		 */
-                Camera(int width, int height,float near, int type);
+		Camera(int width, int height,float near, int type);
 		//! Destructor
 		~Camera();
 		
