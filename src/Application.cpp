@@ -216,6 +216,33 @@ void Application::on_event(SDL_Event* Event)
 				else  if (m_renderer->get_view_mode() == 1)
 					m_renderer->set_view_mode(0);
 			break;
+			//~ Arrow up
+			case 273 :
+			{
+				m_renderer->get_rig()->get_camera_one()->set_dioc(m_renderer->get_rig()->get_camera_one()->get_dioc()+0.005);
+				m_renderer->get_rig()->get_camera_two()->set_dioc(m_renderer->get_rig()->get_camera_two()->get_dioc()+0.005);
+				
+				const float dc = m_renderer->get_dc();
+				
+				m_renderer->get_rig()->get_camera_one()->compute_projection_matrix(dc);
+				m_renderer->get_rig()->get_camera_two()->compute_projection_matrix(dc);
+				
+				m_renderer->get_rig()->update_position(0,0.0f);
+			}
+			break;
+			//~ Arrow down
+			case 274 :
+			{
+				m_renderer->get_rig()->get_camera_one()->set_dioc(m_renderer->get_rig()->get_camera_one()->get_dioc()-0.005);
+				m_renderer->get_rig()->get_camera_two()->set_dioc(m_renderer->get_rig()->get_camera_two()->get_dioc()-0.005);
+				
+				const float dc = m_renderer->get_dc();
+				
+				m_renderer->get_rig()->get_camera_one()->compute_projection_matrix(dc);
+				m_renderer->get_rig()->get_camera_two()->compute_projection_matrix(dc);
+				
+				m_renderer->get_rig()->update_position(0,0.0f);
+			}
 			break; 
 			default : ;
 			break;

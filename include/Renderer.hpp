@@ -71,6 +71,11 @@ class Renderer
 		 * \return the display gui mode
 		 */
 		bool get_display_gui() const;
+		//! Gets the distance between the camera and the virtual plane
+		/*!
+		 * \return the distance between the camera and the virtual plane
+		 */
+		float get_dc() const;
 		//! Sets the view mode
 		/*!
 		 * \param mode the view mode

@@ -547,6 +547,11 @@ bool Renderer::get_display_gui() const
 	return m_display_gui;
 }
 
+float Renderer::get_dc() const
+{
+	return m_dc;
+}
+
 //~ Setters
 
 void Renderer::set_view_mode(const int mode)
