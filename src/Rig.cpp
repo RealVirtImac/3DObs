@@ -132,6 +132,16 @@ void Rig::update_target()
 	m_camera_two->set_target(m_target);
 }
 
+void Rig::update_up()
+{
+	glm::vec3 right = glm::vec3(sin(m_horizontal_angle - M_PI/2.0f), 0, cos(m_horizontal_angle - M_PI/2.0f));
+	m_right = glm::normalize(right);
+	glm::vec3 up = glm::cross(m_right, m_target);
+	
+	m_camera_one->set_up(up);
+	m_camera_two->set_up(up);
+}
+
 void Rig::change_dioc(const float delta, const float dc)
 {
 	m_camera_one->set_dioc(m_camera_one->get_dioc()+delta);

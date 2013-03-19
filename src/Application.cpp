@@ -10,7 +10,8 @@ Application::Application():
 	m_running(true),
 	m_display(NULL),
 	m_joystick(NULL),
-	m_display_gui(true)
+	m_display_gui(true),
+	m_has_focus_changed(false)
 {
 }
 
@@ -120,9 +121,8 @@ void Application::on_loop()
 	
 	if(m_display_gui)
 	{
-		m_renderer->get_rig()->update_horizontal_angle(m_width/2);
-		m_renderer->get_rig()->update_vertical_angle(m_height/2);
-		m_renderer->get_rig()->update_target();
+		m_renderer->get_rig()->update_horizontal_angle(m_display->w/2);
+		m_renderer->get_rig()->update_vertical_angle(m_display->h/2);
 		
 		m_renderer->set_display_gui(true);
 		
@@ -130,15 +130,23 @@ void Application::on_loop()
 	}
 	else
 	{
-		SDL_WarpMouse(m_width/2, m_height/2);
+		SDL_WarpMouse(m_display->w/2, m_display->h/2);
+		if(m_has_focus_changed)
+		{
+			m_mouse_x = m_display->w/2;
+			m_mouse_y = m_display->h/2;
+			m_has_focus_changed = !m_has_focus_changed;
+		}
 		m_renderer->get_rig()->update_horizontal_angle(m_mouse_x);
 		m_renderer->get_rig()->update_vertical_angle(m_mouse_y);
-		m_renderer->get_rig()->update_target();
 		
 		m_renderer->set_display_gui(false);
 		
 		SDL_ShowCursor(SDL_DISABLE);
 	}
+	
+	m_renderer->get_rig()->update_target();
+	m_renderer->get_rig()->update_up();
 	
 	m_renderer->get_rig()->get_camera_one()->compute_view_matrix();
 	m_renderer->get_rig()->get_camera_two()->compute_view_matrix();
@@ -154,14 +162,25 @@ void Application::on_event(SDL_Event* Event)
 	{
 		if(Event->button.button == SDL_BUTTON_RIGHT)
 		{
-			m_display_gui = !m_display_gui;
+			if(!(m_display->flags & SDL_FULLSCREEN))
+			{
+				m_display_gui = !m_display_gui;
+				if(!m_display_gui)
+				{
+					m_has_focus_changed = !m_has_focus_changed;
+				}
+			}
 		}
 	}
 	if(Event->type == SDL_KEYDOWN)
 	{
 		switch(Event->key.keysym.sym)
 		{
-			case SDLK_ESCAPE: m_running = false;
+			case SDLK_ESCAPE: 
+			{
+				m_running = false;
+				if(m_display->flags & SDL_FULLSCREEN) SDL_WM_ToggleFullScreen(m_display); 
+			}
 			break;
 			//~ Forward
 			case SDLK_z :	m_input_keys.at(1) = true;
@@ -224,6 +243,8 @@ void Application::on_event(SDL_Event* Event)
 			break; 
 			case SDLK_o : m_renderer->get_rig()->reset_dioc(m_renderer->get_dc());
 			break; 
+			case SDLK_f : SDL_WM_ToggleFullScreen(m_display);
+			break; 
 			default : ;
 			break;
 		}
@@ -233,6 +254,7 @@ void Application::on_event(SDL_Event* Event)
 		if((int)Event->jbutton.button == 7)
 		{
 			m_running = false;
+			if(m_display->flags & SDL_FULLSCREEN) SDL_WM_ToggleFullScreen(m_display); 
 		}
 		if((int)Event->jbutton.button == 0)
 		{

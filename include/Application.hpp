@@ -67,4 +67,6 @@ class Application
 		std::vector<bool> m_input_keys;
 		
 		bool m_display_gui;
+		
+		bool m_has_focus_changed;
 };

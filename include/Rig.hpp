@@ -66,6 +66,8 @@ class Rig
 		void update_vertical_angle(const int mouse_y);
 		//! Updates the target of the rig
 		void update_target();
+		//! Updates up vector of the cameras
+		void update_up();
 		//! Changes the dioc and applies the proper effects to the cameras
 		/*!
 		 * \param delta The value that is going to be added to the dioc (can be negative)

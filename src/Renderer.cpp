@@ -30,8 +30,6 @@ Renderer::Renderer(int width, int height):
 		exit(EXIT_FAILURE);
 	}
 	
-	//~ load_object(std::string("frigate.obj"),std::string("frigate.jpg"));
-	
 	//~ Loading quads
 	try
 	{
