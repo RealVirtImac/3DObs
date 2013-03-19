@@ -86,28 +86,6 @@ int Application::on_execute()
 void Application::on_loop()
 {
 	SDL_GetMouseState(&m_mouse_x,&m_mouse_y);
-	
-	if(m_display_gui)
-	{
-		m_renderer->get_rig()->update_horizontal_angle(m_width/2);
-		m_renderer->get_rig()->update_vertical_angle(m_height/2);
-		m_renderer->get_rig()->update_target();
-		
-		m_renderer->set_display_gui(true);
-		
-		SDL_ShowCursor(SDL_ENABLE);
-	}
-	else
-	{
-		SDL_WarpMouse(m_width/2, m_height/2);
-		m_renderer->get_rig()->update_horizontal_angle(m_mouse_x);
-		m_renderer->get_rig()->update_vertical_angle(m_mouse_y);
-		m_renderer->get_rig()->update_target();
-		
-		m_renderer->set_display_gui(false);
-		
-		SDL_ShowCursor(SDL_DISABLE);
-	}
 
 	for(unsigned int i = 0; i < m_input_keys.size(); ++i)
 	{
@@ -138,6 +116,28 @@ void Application::on_loop()
 		if(SDL_JoystickGetAxis(m_joystick, 4) > 1 ) m_renderer->get_rig()->update_position(4,1.0f);
 		//~ LT
 		if(SDL_JoystickGetAxis(m_joystick, 5) > 1 ) m_renderer->get_rig()->update_position(5,1.0f);
+	}
+	
+	if(m_display_gui)
+	{
+		m_renderer->get_rig()->update_horizontal_angle(m_width/2);
+		m_renderer->get_rig()->update_vertical_angle(m_height/2);
+		m_renderer->get_rig()->update_target();
+		
+		m_renderer->set_display_gui(true);
+		
+		SDL_ShowCursor(SDL_ENABLE);
+	}
+	else
+	{
+		SDL_WarpMouse(m_width/2, m_height/2);
+		m_renderer->get_rig()->update_horizontal_angle(m_mouse_x);
+		m_renderer->get_rig()->update_vertical_angle(m_mouse_y);
+		m_renderer->get_rig()->update_target();
+		
+		m_renderer->set_display_gui(false);
+		
+		SDL_ShowCursor(SDL_DISABLE);
 	}
 	
 	m_renderer->get_rig()->get_camera_one()->compute_view_matrix();
@@ -217,32 +217,12 @@ void Application::on_event(SDL_Event* Event)
 					m_renderer->set_view_mode(0);
 			break;
 			//~ Arrow up
-			case 273 :
-			{
-				m_renderer->get_rig()->get_camera_one()->set_dioc(m_renderer->get_rig()->get_camera_one()->get_dioc()+0.005);
-				m_renderer->get_rig()->get_camera_two()->set_dioc(m_renderer->get_rig()->get_camera_two()->get_dioc()+0.005);
-				
-				const float dc = m_renderer->get_dc();
-				
-				m_renderer->get_rig()->get_camera_one()->compute_projection_matrix(dc);
-				m_renderer->get_rig()->get_camera_two()->compute_projection_matrix(dc);
-				
-				m_renderer->get_rig()->update_position(0,0.0f);
-			}
+			case 273 : m_renderer->get_rig()->change_dioc(0.005,m_renderer->get_dc());
 			break;
 			//~ Arrow down
-			case 274 :
-			{
-				m_renderer->get_rig()->get_camera_one()->set_dioc(m_renderer->get_rig()->get_camera_one()->get_dioc()-0.005);
-				m_renderer->get_rig()->get_camera_two()->set_dioc(m_renderer->get_rig()->get_camera_two()->get_dioc()-0.005);
-				
-				const float dc = m_renderer->get_dc();
-				
-				m_renderer->get_rig()->get_camera_one()->compute_projection_matrix(dc);
-				m_renderer->get_rig()->get_camera_two()->compute_projection_matrix(dc);
-				
-				m_renderer->get_rig()->update_position(0,0.0f);
-			}
+			case 274 : m_renderer->get_rig()->change_dioc(-0.005,m_renderer->get_dc());
+			break; 
+			case SDLK_o : m_renderer->get_rig()->reset_dioc(m_renderer->get_dc());
 			break; 
 			default : ;
 			break;
@@ -253,6 +233,21 @@ void Application::on_event(SDL_Event* Event)
 		if((int)Event->jbutton.button == 7)
 		{
 			m_running = false;
+		}
+		if((int)Event->jbutton.button == 0)
+		{
+			m_renderer->get_rig()->reset_dioc(m_renderer->get_dc());
+		}
+	}
+	if(Event->type == SDL_JOYHATMOTION)
+	{
+		if(Event->jhat.value & SDL_HAT_UP)
+		{
+			m_renderer->get_rig()->change_dioc(0.005,m_renderer->get_dc());
+		}
+		if(Event->jhat.value & SDL_HAT_DOWN)
+		{
+			m_renderer->get_rig()->change_dioc(-0.005,m_renderer->get_dc());
 		}
 	}
 }

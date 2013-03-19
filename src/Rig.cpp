@@ -132,6 +132,28 @@ void Rig::update_target()
 	m_camera_two->set_target(m_target);
 }
 
+void Rig::change_dioc(const float delta, const float dc)
+{
+	m_camera_one->set_dioc(m_camera_one->get_dioc()+delta);
+	m_camera_two->set_dioc(m_camera_two->get_dioc()+delta);
+	
+	m_camera_one->compute_projection_matrix(dc);
+	m_camera_two->compute_projection_matrix(dc);
+	
+	update_position(0,0.0f);
+}
+
+void Rig::reset_dioc(const float dc)
+{
+	m_camera_one->set_dioc(0.065);
+	m_camera_two->set_dioc(0.065);
+	
+	m_camera_one->compute_projection_matrix(dc);
+	m_camera_two->compute_projection_matrix(dc);
+	
+	update_position(0,0.0f);
+}
+
 //~ Getters
 glm::vec3 Rig::get_position() const
 {

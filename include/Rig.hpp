@@ -66,7 +66,14 @@ class Rig
 		void update_vertical_angle(const int mouse_y);
 		//! Updates the target of the rig
 		void update_target();
-		 
+		//! Changes the dioc and applies the proper effects to the cameras
+		/*!
+		 * \param delta The value that is going to be added to the dioc (can be negative)
+		 * \param dc The distance between the camera and the virtual plane
+		 */
+		void change_dioc(const float delta, const float dc);
+		//! Resets the dioc to 6.5cm and applies the proper effects to the cameras
+		void reset_dioc(const float dc);
 		//! Gets the position of the rig
 		/*!
 		 * \return The position of the rig
