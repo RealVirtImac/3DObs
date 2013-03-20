@@ -108,17 +108,12 @@ void Application::on_loop()
 		if(SDL_JoystickGetAxis(m_joystick, 0) < -epsilon) m_renderer->get_rig()->update_position(2,abs(SDL_JoystickGetAxis(m_joystick, 0)/10000.0));
 		if(SDL_JoystickGetAxis(m_joystick, 0) > epsilon) m_renderer->get_rig()->update_position(3,abs(SDL_JoystickGetAxis(m_joystick, 0)/10000.0));
 		
-		//~ //Eyes to the left / Right
+		//~ //Eyes to the left / Right	
 		if(SDL_JoystickGetAxis(m_joystick, 2) < -epsilon) m_mouse_x -= (abs(SDL_JoystickGetAxis(m_joystick, 2)/1000.0));
 		if(SDL_JoystickGetAxis(m_joystick, 2) > epsilon) m_mouse_x += (abs(SDL_JoystickGetAxis(m_joystick, 2)/1000.0));
 		//~ //Eyes to the ground / sky
 		if(SDL_JoystickGetAxis(m_joystick, 3) < -epsilon) m_mouse_y -= (abs(SDL_JoystickGetAxis(m_joystick, 3)/1000.0));
 		if(SDL_JoystickGetAxis(m_joystick, 3) > epsilon) m_mouse_y += (abs(SDL_JoystickGetAxis(m_joystick, 3)/1000.0));
-		
-		//~ RT
-		if(SDL_JoystickGetAxis(m_joystick, 4) > 1 ) m_renderer->get_rig()->update_position(4,1.0f);
-		//~ LT
-		if(SDL_JoystickGetAxis(m_joystick, 5) > 1 ) m_renderer->get_rig()->update_position(5,1.0f);
 	}
 	
 	if(m_display_gui)
