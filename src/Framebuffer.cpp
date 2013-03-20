@@ -1,3 +1,9 @@
+/*!
+ * \file Framebuffer.cpp
+ * \brief A framebuffer class
+ * \author R. Bertozzi & S. Bougeois 
+ */
+
 #include "../include/Framebuffer.hpp"
 
 Framebuffer::Framebuffer(const int number_of_color_textures, const unsigned int width, const unsigned int height):
