@@ -29,7 +29,7 @@ class Rig
 		 * \param width The width of the window
 		 * \param height The height of the window
 		 */ 
-		Rig(glm::vec3 position, float dioc, float dc, glm::vec3 up, glm::vec3 target, int width, int height);
+                Rig(glm::vec3 position, float dioc, float dc, float l, glm::vec3 up, glm::vec3 target, int width, int height);
 		//! Destructor
 		~Rig();
 		
@@ -73,9 +73,9 @@ class Rig
 		 * \param delta The value that is going to be added to the dioc (can be negative)
 		 * \param dc The distance between the camera and the virtual plane
 		 */
-		void change_dioc(const float delta, const float dc);
+                void change_dioc(const float delta, const float dc, const float l);
 		//! Resets the dioc to 6.5cm and applies the proper effects to the cameras
-		void reset_dioc(const float dc);
+                void reset_dioc(const float dc, const float l);
 		//! Gets the position of the rig
 		/*!
 		 * \return The position of the rig

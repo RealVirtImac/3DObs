@@ -14,6 +14,7 @@ Renderer::Renderer(int width, int height):
 	m_gui_textures_toggle(false),
 	m_gui_keyboard_layout(true),
 	m_dc(2.0f),
+        m_l(4.0f),
 	m_selected_model(""),
 	m_selected_texture("")
 {
@@ -83,7 +84,7 @@ Renderer::Renderer(int width, int height):
 	glm::vec3 rig_up = glm::vec3(0.0f,1.0f,0.0f);
 	glm::vec3 rig_target = glm::vec3(0.0f,0.0f,1.0f);
 	float rig_dioc = 0.065;
-	m_rig = new Rig(rig_position, rig_dioc, m_dc, rig_up, rig_target, m_width, m_height);
+        m_rig = new Rig(rig_position, rig_dioc, m_dc, m_l, rig_up, rig_target, m_width, m_height);
 	
 	//~ Creating the framebuffers
 	m_left_camera_framebuffer = new Framebuffer(1,m_width,m_height);
@@ -568,6 +569,11 @@ bool Renderer::get_display_gui() const
 float Renderer::get_dc() const
 {
 	return m_dc;
+}
+
+float Renderer::get_l() const
+{
+    return m_l;
 }
 
 int Renderer::get_keyboard_layout() const

@@ -6,7 +6,7 @@
 
 #include "../include/Rig.hpp"
 
-Rig::Rig(glm::vec3 position, float dioc, float dc, glm::vec3 up, glm::vec3 target, int width, int height):
+Rig::Rig(glm::vec3 position, float dioc, float dc, float l, glm::vec3 up, glm::vec3 target, int width, int height):
 	m_position(position),
 	m_up(up),
 	m_target(target),
@@ -35,8 +35,8 @@ Rig::Rig(glm::vec3 position, float dioc, float dc, glm::vec3 up, glm::vec3 targe
 	m_camera_one->set_position(m_position - displacement);
 	m_camera_two->set_position(m_position + displacement);
 	
-	m_camera_one->compute_projection_matrix(dc);
-	m_camera_two->compute_projection_matrix(dc);
+        m_camera_one->compute_projection_matrix(dc, l);
+        m_camera_two->compute_projection_matrix(dc, l);
 }
 
 Rig::~Rig()
@@ -142,24 +142,24 @@ void Rig::update_up()
 	m_camera_two->set_up(up);
 }
 
-void Rig::change_dioc(const float delta, const float dc)
+void Rig::change_dioc(const float delta, const float dc, const float l)
 {
 	m_camera_one->set_dioc(m_camera_one->get_dioc()+delta);
 	m_camera_two->set_dioc(m_camera_two->get_dioc()+delta);
 	
-	m_camera_one->compute_projection_matrix(dc);
-	m_camera_two->compute_projection_matrix(dc);
+        m_camera_one->compute_projection_matrix(dc, l);
+        m_camera_two->compute_projection_matrix(dc, l);
 	
 	update_position(0,0.0f);
 }
 
-void Rig::reset_dioc(const float dc)
+void Rig::reset_dioc(const float dc, const float l)
 {
 	m_camera_one->set_dioc(0.065);
 	m_camera_two->set_dioc(0.065);
 	
-	m_camera_one->compute_projection_matrix(dc);
-	m_camera_two->compute_projection_matrix(dc);
+        m_camera_one->compute_projection_matrix(dc, l);
+        m_camera_two->compute_projection_matrix(dc, l);
 	
 	update_position(0,0.0f);
 }

@@ -76,11 +76,18 @@ class Renderer
 		 * \return the distance between the camera and the virtual plane
 		 */
 		float get_dc() const;
+
+                //! Gets the virtual screen width
+                /*!
+                 * \return the virtual screen width
+                 */
+                float get_l() const;
+
 		//! Gets the keyboard's layout
 		/*!
 		 * \return the layout of the keyboard
 		 */
-        int get_keyboard_layout() const;
+                int get_keyboard_layout() const;
 		//! Sets the view mode
 		/*!
 		 * \param mode the view mode
@@ -154,6 +161,8 @@ class Renderer
 		
 		//~ Distance between camera and virtual screen
 		float m_dc;
+                //~ width of the virtual screen
+                float m_l;
 		
 		std::string m_selected_model;
 		std::string m_selected_texture;

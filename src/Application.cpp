@@ -254,12 +254,12 @@ void Application::on_event(SDL_Event* Event)
 					m_renderer->set_view_mode(0);
 			break;
 			//~ Arrow up
-			case SDLK_p : m_renderer->get_rig()->change_dioc(0.005,m_renderer->get_dc());
+                        case SDLK_p : m_renderer->get_rig()->change_dioc(0.005,m_renderer->get_dc(), m_renderer->get_l());
 			break;
 			//~ Arrow down
-			case SDLK_l : m_renderer->get_rig()->change_dioc(-0.005,m_renderer->get_dc());
+                        case SDLK_l : m_renderer->get_rig()->change_dioc(-0.005,m_renderer->get_dc(), m_renderer->get_l());
 			break;
-			case SDLK_o : m_renderer->get_rig()->reset_dioc(m_renderer->get_dc());
+                        case SDLK_o : m_renderer->get_rig()->reset_dioc(m_renderer->get_dc(), m_renderer->get_l());
 			break;
 			default : ;
 			break;
@@ -273,18 +273,18 @@ void Application::on_event(SDL_Event* Event)
 		}
 		if((int)Event->jbutton.button == 0)
 		{
-			m_renderer->get_rig()->reset_dioc(m_renderer->get_dc());
+                        m_renderer->get_rig()->reset_dioc(m_renderer->get_dc(), m_renderer->get_l());
 		}
 	}
 	if(Event->type == SDL_JOYHATMOTION)
 	{
 		if(Event->jhat.value & SDL_HAT_UP)
 		{
-			m_renderer->get_rig()->change_dioc(0.005,m_renderer->get_dc());
+                        m_renderer->get_rig()->change_dioc(0.005,m_renderer->get_dc(), m_renderer->get_l());
 		}
 		if(Event->jhat.value & SDL_HAT_DOWN)
 		{
-			m_renderer->get_rig()->change_dioc(-0.005,m_renderer->get_dc());
+                        m_renderer->get_rig()->change_dioc(-0.005,m_renderer->get_dc(), m_renderer->get_l());
 		}
 	}
 }

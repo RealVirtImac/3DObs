@@ -31,9 +31,9 @@ void Camera::compute_view_matrix()
 	m_view_matrix = glm::lookAt(m_position,m_position+m_target,m_up);
 }
 
-void Camera::compute_projection_matrix(float dc)
+void Camera::compute_projection_matrix(float dc, float l)
 {
-	float L = 4.0;
+        float L = l;
 	float H = L/m_ratio;
 
 	//Frustum (left camera)
