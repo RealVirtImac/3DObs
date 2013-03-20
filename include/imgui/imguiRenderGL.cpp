@@ -20,6 +20,9 @@
 #include <math.h>
 #include <stdio.h>
 
+#ifdef _WIN32
+	#define GLEW_STATIC
+#endif
 #include "imgui.h"
 #include <GL/glew.h>
 
