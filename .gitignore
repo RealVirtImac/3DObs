@@ -5,6 +5,8 @@
 models/*
 textures/*
 
+!models/quad.obj
+
 3DObs
 
 #IDE's files#
