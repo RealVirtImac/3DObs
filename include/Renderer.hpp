@@ -1,4 +1,29 @@
-#pragma once
+/***************************************************************************
+									Renderer.hpp
+                             --------------------
+    begin                : Feb 1 2013
+    copyright            : (C) 2013 by R. Bertozzi & S. Bougeois
+    email                : romain.bertozzi@gmail.com s.bougeois@gmail.com
+ ***************************************************************************/
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ *                                                                         *
+ ***************************************************************************/
 
 //!  Renderer of the context
 /*!
@@ -6,6 +31,8 @@
   * \brief Renderer of the context
   * \file Renderer.hpp
 */
+
+#pragma once
 
 #include <GL/glew.h>
 #include <stdexcept>
@@ -77,11 +104,11 @@ class Renderer
 		 */
 		float get_dc() const;
 
-                //! Gets the virtual screen width
-                /*!
-                 * \return the virtual screen width
-                 */
-                float get_l() const;
+		//! Gets the virtual screen width
+		/*!
+		 * \return the virtual screen width
+		 */
+		float get_l() const;
 
 		//! Gets the keyboard's layout
 		/*!
@@ -130,14 +157,6 @@ class Renderer
 		GLuint m_lighting_shader_diffuse_texture;
 		GLuint m_lighting_shader_light_intensity;
 		GLuint m_lighting_shader_light_radius;
-		
-		GLuint m_lighting_no_texture_shader_program;
-		GLuint m_lighting_no_texture_shader_model_matrix_position;
-		GLuint m_lighting_no_texture_shader_view_matrix_position;
-		GLuint m_lighting_no_texture_shader_projection_matrix_position;
-		GLuint m_lighting_no_texture_shader_camera_position;
-		GLuint m_lighting_no_texture_shader_light_intensity;
-		GLuint m_lighting_no_texture_shader_light_radius;
 
 		GLuint m_quad_shader;
 		GLuint m_quad_shader_texture_1;
@@ -161,8 +180,8 @@ class Renderer
 		
 		//~ Distance between camera and virtual screen
 		float m_dc;
-                //~ width of the virtual screen
-                float m_l;
+		//~ width of the virtual screen
+		float m_l;
 		
 		std::string m_selected_model;
 		std::string m_selected_texture;

@@ -1,3 +1,30 @@
+/***************************************************************************
+									Rig.cpp
+                             --------------------
+    begin                : Feb 1 2013
+    copyright            : (C) 2013 by R. Bertozzi & S. Bougeois
+    email                : romain.bertozzi@gmail.com s.bougeois@gmail.com
+ ***************************************************************************/
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ *                                                                         *
+ ***************************************************************************/
+
 /*!
  * \file Rig.cpp
  * \brief The rig that maintains the cameras in a single entity
@@ -34,9 +61,9 @@ Rig::Rig(glm::vec3 position, float dioc, float dc, float l, glm::vec3 up, glm::v
 	glm::vec3 displacement = (m_camera_one->get_dioc()/2)*orthogonal_vector;
 	m_camera_one->set_position(m_position - displacement);
 	m_camera_two->set_position(m_position + displacement);
-	
-        m_camera_one->compute_projection_matrix(dc, l);
-        m_camera_two->compute_projection_matrix(dc, l);
+
+	m_camera_one->compute_projection_matrix(dc, l);
+	m_camera_two->compute_projection_matrix(dc, l);
 }
 
 Rig::~Rig()
@@ -147,8 +174,8 @@ void Rig::change_dioc(const float delta, const float dc, const float l)
 	m_camera_one->set_dioc(m_camera_one->get_dioc()+delta);
 	m_camera_two->set_dioc(m_camera_two->get_dioc()+delta);
 	
-        m_camera_one->compute_projection_matrix(dc, l);
-        m_camera_two->compute_projection_matrix(dc, l);
+	m_camera_one->compute_projection_matrix(dc, l);
+	m_camera_two->compute_projection_matrix(dc, l);
 	
 	update_position(0,0.0f);
 }
@@ -158,8 +185,8 @@ void Rig::reset_dioc(const float dc, const float l)
 	m_camera_one->set_dioc(0.065);
 	m_camera_two->set_dioc(0.065);
 	
-        m_camera_one->compute_projection_matrix(dc, l);
-        m_camera_two->compute_projection_matrix(dc, l);
+	m_camera_one->compute_projection_matrix(dc, l);
+	m_camera_two->compute_projection_matrix(dc, l);
 	
 	update_position(0,0.0f);
 }

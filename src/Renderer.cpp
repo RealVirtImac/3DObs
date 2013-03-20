@@ -1,3 +1,30 @@
+/***************************************************************************
+									Renderer.cpp
+                             --------------------
+    begin                : Feb 1 2013
+    copyright            : (C) 2013 by R. Bertozzi & S. Bougeois
+    email                : romain.bertozzi@gmail.com s.bougeois@gmail.com
+ ***************************************************************************/
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ *                                                                         *
+ ***************************************************************************/
+
 /*!
  * \file Renderer.cpp
  * \brief Renderer of the context
@@ -14,9 +41,10 @@ Renderer::Renderer(int width, int height):
 	m_gui_textures_toggle(false),
 	m_gui_keyboard_layout(true),
 	m_dc(2.0f),
-        m_l(4.0f),
+	m_l(4.0f),
 	m_selected_model(""),
-	m_selected_texture("")
+	m_selected_texture(""),
+	m_keyboard_layout(0)
 {
 	GLenum error;
 	if((error = glewInit()) != GLEW_OK) {
@@ -50,7 +78,6 @@ Renderer::Renderer(int width, int height):
 	//~ Compiling shaders
 	m_basic_shader_program = loadProgram("shaders/basic.vertex.glsl","shaders/basic.fragment.glsl");
 	m_lighting_shader_program = loadProgram("shaders/lighting.vertex.glsl","shaders/lighting.fragment.glsl");
-	m_lighting_no_texture_shader_program = loadProgram("shaders/lighting.vertex.glsl","shaders/lighting_no_tex.fragment.glsl");
 	m_quad_shader = loadProgram("shaders/quad.vertex.glsl","shaders/quad.fragment.glsl");
 	
 	//~ Locating uniforms
@@ -65,13 +92,6 @@ Renderer::Renderer(int width, int height):
 	m_lighting_shader_diffuse_texture = glGetUniformLocation(m_lighting_shader_program, "diffuse_texture");
 	m_lighting_shader_light_intensity = glGetUniformLocation(m_lighting_shader_program, "lightIntensity");
 	m_lighting_shader_light_radius = glGetUniformLocation(m_lighting_shader_program, "distance");
-	
-	m_lighting_no_texture_shader_model_matrix_position = glGetUniformLocation(m_lighting_no_texture_shader_program,"model_matrix");
-	m_lighting_no_texture_shader_view_matrix_position = glGetUniformLocation(m_lighting_no_texture_shader_program,"view_matrix");
-	m_lighting_no_texture_shader_projection_matrix_position = glGetUniformLocation(m_lighting_no_texture_shader_program,"projection_matrix");
-	m_lighting_no_texture_shader_camera_position = glGetUniformLocation(m_lighting_no_texture_shader_program,"camera_position");
-	m_lighting_no_texture_shader_light_intensity = glGetUniformLocation(m_lighting_no_texture_shader_program, "lightIntensity");
-	m_lighting_no_texture_shader_light_radius = glGetUniformLocation(m_lighting_no_texture_shader_program, "distance");
 
 	m_quad_shader_texture_1 = glGetUniformLocation(m_quad_shader, "renderedTexture1");
 	m_quad_shader_texture_2 = glGetUniformLocation(m_quad_shader, "renderedTexture2");
@@ -84,7 +104,7 @@ Renderer::Renderer(int width, int height):
 	glm::vec3 rig_up = glm::vec3(0.0f,1.0f,0.0f);
 	glm::vec3 rig_target = glm::vec3(0.0f,0.0f,1.0f);
 	float rig_dioc = 0.065;
-        m_rig = new Rig(rig_position, rig_dioc, m_dc, m_l, rig_up, rig_target, m_width, m_height);
+	m_rig = new Rig(rig_position, rig_dioc, m_dc, m_l, rig_up, rig_target, m_width, m_height);
 	
 	//~ Creating the framebuffers
 	m_left_camera_framebuffer = new Framebuffer(1,m_width,m_height);
@@ -204,16 +224,14 @@ void Renderer::render()
 	{
 		if(m_object != NULL)
 		{
-		//~ ------------------------------------------------------------------------------------------------------------
-		//~ Rendering the first camera
-		//~ ------------------------------------------------------------------------------------------------------------
-		glBindFramebuffer(GL_FRAMEBUFFER, m_left_camera_framebuffer->get_framebuffer_id());
-		glClearColor(0.0,0.0,0.0,1.0);
-		glViewport(0, 0, m_width, m_height);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		//~ Choosing shader
-		if(m_object->get_texture_path() != NULL)
-		{
+			//~ ------------------------------------------------------------------------------------------------------------
+			//~ Rendering the first camera
+			//~ ------------------------------------------------------------------------------------------------------------
+			glBindFramebuffer(GL_FRAMEBUFFER, m_left_camera_framebuffer->get_framebuffer_id());
+			glClearColor(0.0,0.0,0.0,1.0);
+			glViewport(0, 0, m_width, m_height);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			//~ Choosing shader
 			glUseProgram(m_lighting_shader_program);
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, m_object->get_diffuse_texture());
@@ -224,37 +242,24 @@ void Renderer::render()
 			glUniform3fv(m_lighting_shader_camera_position, GL_FALSE, glm::value_ptr(m_rig->get_camera_one()->get_position()));
 			glUniform1f(m_lighting_shader_light_intensity, m_lightIntensity);
 			glUniform1f(m_lighting_shader_light_radius, m_radiusLight);
-		}
-		else 
-		{
-			glUseProgram(m_lighting_no_texture_shader_program);
-			glUniformMatrix4fv(m_lighting_no_texture_shader_model_matrix_position, 1, GL_FALSE, glm::value_ptr(m_object->get_model_matrix()));
-			glUniformMatrix4fv(m_lighting_no_texture_shader_view_matrix_position, 1, GL_FALSE, glm::value_ptr(m_rig->get_camera_one()->get_view_matrix()));
-			glUniformMatrix4fv(m_lighting_no_texture_shader_projection_matrix_position, 1, GL_FALSE, glm::value_ptr(m_rig->get_camera_one()->get_projection_matrix()));
-			glUniform3fv(m_lighting_no_texture_shader_camera_position, GL_FALSE, glm::value_ptr(m_rig->get_camera_one()->get_position()));
-			glUniform1f(m_lighting_no_texture_shader_light_intensity, m_lightIntensity);
-			glUniform1f(m_lighting_no_texture_shader_light_radius, m_radiusLight);
-		}
-		
-		//~ Binding vao
-		glBindVertexArray(m_object->get_vao());
-		//~ Drawing
-		glDrawArrays(GL_TRIANGLES, 0, m_object->get_size());
+			
+			//~ Binding vao
+			glBindVertexArray(m_object->get_vao());
+			//~ Drawing
+			glDrawArrays(GL_TRIANGLES, 0, m_object->get_size());
 
-		//~ Unbind
-		glBindVertexArray(0);
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		
-		//~ ------------------------------------------------------------------------------------------------------------
-		//~ Rendering the second camera
-		//~ ------------------------------------------------------------------------------------------------------------
-		glBindFramebuffer(GL_FRAMEBUFFER, m_right_camera_framebuffer->get_framebuffer_id());
-		glClearColor(0.0,0.0,0.0,1.0);
-		glViewport(0, 0, m_width, m_height);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		//~ Choosing shader
-		if(m_object->get_texture_path() != NULL)
-		{
+			//~ Unbind
+			glBindVertexArray(0);
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+			
+			//~ ------------------------------------------------------------------------------------------------------------
+			//~ Rendering the second camera
+			//~ ------------------------------------------------------------------------------------------------------------
+			glBindFramebuffer(GL_FRAMEBUFFER, m_right_camera_framebuffer->get_framebuffer_id());
+			glClearColor(0.0,0.0,0.0,1.0);
+			glViewport(0, 0, m_width, m_height);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			//~ Choosing shader
 			glUseProgram(m_lighting_shader_program);
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, m_object->get_diffuse_texture());
@@ -263,29 +268,19 @@ void Renderer::render()
 			glUniformMatrix4fv(m_lighting_shader_view_matrix_position, 1, GL_FALSE, glm::value_ptr(m_rig->get_camera_two()->get_view_matrix()));
 			glUniformMatrix4fv(m_lighting_shader_projection_matrix_position, 1, GL_FALSE, glm::value_ptr(m_rig->get_camera_two()->get_projection_matrix()));
 			glUniform3fv(m_lighting_shader_camera_position, GL_FALSE, glm::value_ptr(m_rig->get_camera_two()->get_position()));
-		}
-		else 
-		{
-			glUseProgram(m_lighting_no_texture_shader_program);
-			glUniformMatrix4fv(m_lighting_no_texture_shader_model_matrix_position, 1, GL_FALSE, glm::value_ptr(m_object->get_model_matrix()));
-			glUniformMatrix4fv(m_lighting_no_texture_shader_view_matrix_position, 1, GL_FALSE, glm::value_ptr(m_rig->get_camera_two()->get_view_matrix()));
-			glUniformMatrix4fv(m_lighting_no_texture_shader_projection_matrix_position, 1, GL_FALSE, glm::value_ptr(m_rig->get_camera_two()->get_projection_matrix()));
-			glUniform3fv(m_lighting_no_texture_shader_camera_position, GL_FALSE, glm::value_ptr(m_rig->get_camera_two()->get_position()));
-		}
-		
-		//~ Binding vao
-		glBindVertexArray(m_object->get_vao());
-		//~ Drawing
-		glDrawArrays(GL_TRIANGLES, 0, m_object->get_size());
+			
+			//~ Binding vao
+			glBindVertexArray(m_object->get_vao());
+			//~ Drawing
+			glDrawArrays(GL_TRIANGLES, 0, m_object->get_size());
 
-		//~ Unbind
-		glBindVertexArray(0);
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		
-		//~ ------------------------------------------------------------------------------------------------------------
-		//~ Rendering the final view
-		//~ ------------------------------------------------------------------------------------------------------------
-
+			//~ Unbind
+			glBindVertexArray(0);
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+			
+			//~ ------------------------------------------------------------------------------------------------------------
+			//~ Rendering the final view
+			//~ ------------------------------------------------------------------------------------------------------------
 			//~ //Anaglyph
 			if (m_view_mode == 0)
 			{
