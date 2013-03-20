@@ -8,7 +8,7 @@
   * \file Application.hpp
 */
 
-
+#include <utility>
 #include <GL/glew.h>
 #include <SDL/SDL.h>
 #include <SDL/SDL_getenv.h>

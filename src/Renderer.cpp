@@ -12,6 +12,7 @@ Renderer::Renderer(int width, int height):
 	m_display_gui(true),
 	m_gui_models_toggle(false),
 	m_gui_textures_toggle(false),
+	m_gui_keyboard_layout(true),
 	m_dc(2.0f),
 	m_selected_model(""),
 	m_selected_texture("")
@@ -172,6 +173,25 @@ void Renderer::render()
 			imguiUnindent();
 		}
 		if(m_toggle) m_gui_textures_toggle = !m_gui_textures_toggle;
+		
+		m_toggle = imguiCollapse("Keyboard", "", m_gui_keyboard_layout);
+		if (m_gui_keyboard_layout)
+		{
+			imguiIndent();
+                int res1 = imguiButton("Azerty layout");
+                int res2 = imguiButton("Qwerty layout");
+                if(res1)
+                {
+                    m_keyboard_layout = 0;
+                }
+                if(res2)
+                {
+                    m_keyboard_layout = 1;
+                }
+			imguiUnindent();
+		}
+		if(m_toggle) m_gui_keyboard_layout = !m_gui_keyboard_layout;
+		
 		imguiEndScrollArea();
 		imguiEndFrame();
 		imguiRenderGLDraw(m_width, m_height); 
@@ -550,6 +570,11 @@ float Renderer::get_dc() const
 	return m_dc;
 }
 
+int Renderer::get_keyboard_layout() const
+{
+    return m_keyboard_layout;
+}
+
 //~ Setters
 
 void Renderer::set_view_mode(const int mode)
@@ -560,4 +585,9 @@ void Renderer::set_view_mode(const int mode)
 void Renderer::set_display_gui(const bool mode)
 {
 	m_display_gui = mode;
+}
+
+void Renderer::set_keyboard_layout(const int layout)
+{
+    m_keyboard_layout = layout;
 }

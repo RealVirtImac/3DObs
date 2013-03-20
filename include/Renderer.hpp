@@ -76,6 +76,11 @@ class Renderer
 		 * \return the distance between the camera and the virtual plane
 		 */
 		float get_dc() const;
+		//! Gets the keyboard's layout
+		/*!
+		 * \return the layout of the keyboard
+		 */
+        int get_keyboard_layout() const;
 		//! Sets the view mode
 		/*!
 		 * \param mode the view mode
@@ -86,6 +91,11 @@ class Renderer
 		 * \param mode the display mode
 		 */
 		void set_display_gui(const bool mode);
+		//! Sets the keyboard's layout
+		/*!
+		 * \param layout the identifier of the keyboard
+		 */
+		void set_keyboard_layout(const int layout);
 		
 	private:
 		int m_width;
@@ -139,6 +149,7 @@ class Renderer
 		
 		bool m_gui_models_toggle;
 		bool m_gui_textures_toggle;
+		bool m_gui_keyboard_layout;
 		int m_toggle;
 		
 		//~ Distance between camera and virtual screen
@@ -146,4 +157,8 @@ class Renderer
 		
 		std::string m_selected_model;
 		std::string m_selected_texture;
+		
+		//0 : AZERTY
+		//1 : QWERTY
+		int m_keyboard_layout;
 };

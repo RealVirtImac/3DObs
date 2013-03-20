@@ -1,4 +1,4 @@
-/*!
+ /*!
  * \file Application.cpp
  * \brief Creates the context of the program
  * \author R. Bertozzi & S. Bougeois 
@@ -48,7 +48,7 @@ bool Application::on_init()
 		std::cout << "There is no joystick" << std::endl;
 	}
 	
-	if((m_display = SDL_SetVideoMode(m_width,m_height,32, SDL_HWSURFACE|SDL_DOUBLEBUF|SDL_OPENGL)) == NULL)
+	if((m_display = SDL_SetVideoMode(m_width,m_height,32, SDL_HWSURFACE|SDL_DOUBLEBUF|SDL_OPENGL|SDL_FULLSCREEN)) == NULL)
 	{
 		return false;
 	}
@@ -56,6 +56,8 @@ bool Application::on_init()
 	m_renderer = new Renderer(m_width,m_height);
 	
 	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+	SDL_EnableUNICODE(SDL_ENABLE);
+	
 	return true;
 }
 
@@ -133,8 +135,13 @@ void Application::on_loop()
 		SDL_WarpMouse(m_display->w/2, m_display->h/2);
 		if(m_has_focus_changed)
 		{
-			m_mouse_x = m_display->w/2;
-			m_mouse_y = m_display->h/2;
+			#ifdef _WIN32
+				m_mouse_x = m_display->w/2;
+				m_mouse_y = m_display->h/2;
+			#elif __linux
+				m_mouse_x = 0.0f;
+				m_mouse_y = 0.0f;
+			#endif
 			m_has_focus_changed = !m_has_focus_changed;
 		}
 		m_renderer->get_rig()->update_horizontal_angle(m_mouse_x);
@@ -162,37 +169,43 @@ void Application::on_event(SDL_Event* Event)
 	{
 		if(Event->button.button == SDL_BUTTON_RIGHT)
 		{
-			if(!(m_display->flags & SDL_FULLSCREEN))
+			m_display_gui = !m_display_gui;
+			if(!m_display_gui)
 			{
-				m_display_gui = !m_display_gui;
-				if(!m_display_gui)
-				{
-					m_has_focus_changed = !m_has_focus_changed;
-				}
+				m_has_focus_changed = !m_has_focus_changed;
 			}
 		}
 	}
 	if(Event->type == SDL_KEYDOWN)
 	{
+	    if(m_renderer->get_keyboard_layout() == 1)
+        {
+            //~ Forward
+            if(Event->key.keysym.sym == 273) m_input_keys.at(1) = true;
+            //~ Backward
+            if(Event->key.keysym.sym == 274) m_input_keys.at(0) = true;
+            //~ Left
+            if(Event->key.keysym.sym == 276) m_input_keys.at(2) = true;
+            //~ Right
+            if(Event->key.keysym.sym == 275) m_input_keys.at(3) = true;
+        }
+         if(m_renderer->get_keyboard_layout() == 0)
+        {
+			//~ Forward
+            if(Event->key.keysym.sym == SDLK_z) m_input_keys.at(1) = true;
+            //~ Backward
+            if(Event->key.keysym.sym == SDLK_s) m_input_keys.at(0) = true;
+            //~ Left
+            if(Event->key.keysym.sym == SDLK_q) m_input_keys.at(2) = true;
+            //~ Right
+            if(Event->key.keysym.sym == SDLK_d) m_input_keys.at(3) = true;
+        }
 		switch(Event->key.keysym.sym)
 		{
-			case SDLK_ESCAPE: 
+			case SDLK_ESCAPE:
 			{
 				m_running = false;
-				if(m_display->flags & SDL_FULLSCREEN) SDL_WM_ToggleFullScreen(m_display); 
 			}
-			break;
-			//~ Forward
-			case SDLK_z :	m_input_keys.at(1) = true;
-			break;
-			//~ Backward
-			case SDLK_s : 	m_input_keys.at(0) = true;
-			break;
-			//~ Left
-			case SDLK_q : 	m_input_keys.at(2) = true;
-			break;
-			//~ Right
-			case SDLK_d : 	m_input_keys.at(3) = true;
 			break;
 			//~ Up
 			case SDLK_t : 	m_input_keys.at(4) = true;
@@ -206,21 +219,31 @@ void Application::on_event(SDL_Event* Event)
 	}
 	if(Event->type == SDL_KEYUP)
 	{
+	    if(m_renderer->get_keyboard_layout() == 1)
+        {
+            //~ Forward
+            if(Event->key.keysym.sym == 273) m_input_keys.at(1) = false;
+            //~ Backward
+            if(Event->key.keysym.sym == 274) m_input_keys.at(0) = false;
+            //~ Left
+            if(Event->key.keysym.sym == 276) m_input_keys.at(2) = false;
+            //~ Right
+            if(Event->key.keysym.sym == 275) m_input_keys.at(3) = false;
+        }
+         if(m_renderer->get_keyboard_layout() == 0)
+        {
+			//~ Forward
+            if(Event->key.keysym.sym == SDLK_z) m_input_keys.at(1) = false;
+            //~ Backward
+            if(Event->key.keysym.sym == SDLK_s) m_input_keys.at(0) = false;
+            //~ Left
+            if(Event->key.keysym.sym == SDLK_q) m_input_keys.at(2) = false;
+            //~ Right
+            if(Event->key.keysym.sym == SDLK_d) m_input_keys.at(3) = false;
+        }
 		switch(Event->key.keysym.sym)
 		{
 			case SDLK_ESCAPE: m_running = false;
-			break;
-			//~ Forward
-			case SDLK_z :	m_input_keys.at(1) = false;
-			break;
-			//~ Backward
-			case SDLK_s : 	m_input_keys.at(0) = false;
-			break;
-			//~ Left
-			case SDLK_q : 	m_input_keys.at(2) = false;
-			break;
-			//~ Right
-			case SDLK_d : 	m_input_keys.at(3) = false;
 			break;
 			//~ Up
 			case SDLK_t : 	m_input_keys.at(4) = false;
@@ -229,22 +252,20 @@ void Application::on_event(SDL_Event* Event)
 			case SDLK_g : 	m_input_keys.at(5) = false;
 			break;
 			//~ Switch view mode
-			case SDLK_a :
+			case SDLK_v :
 				if (m_renderer->get_view_mode() == 0)
 					m_renderer->set_view_mode(1);
 				else  if (m_renderer->get_view_mode() == 1)
 					m_renderer->set_view_mode(0);
 			break;
 			//~ Arrow up
-			case 273 : m_renderer->get_rig()->change_dioc(0.005,m_renderer->get_dc());
+			case SDLK_p : m_renderer->get_rig()->change_dioc(0.005,m_renderer->get_dc());
 			break;
 			//~ Arrow down
-			case 274 : m_renderer->get_rig()->change_dioc(-0.005,m_renderer->get_dc());
-			break; 
+			case SDLK_l : m_renderer->get_rig()->change_dioc(-0.005,m_renderer->get_dc());
+			break;
 			case SDLK_o : m_renderer->get_rig()->reset_dioc(m_renderer->get_dc());
-			break; 
-			case SDLK_f : SDL_WM_ToggleFullScreen(m_display);
-			break; 
+			break;
 			default : ;
 			break;
 		}
@@ -254,7 +275,6 @@ void Application::on_event(SDL_Event* Event)
 		if((int)Event->jbutton.button == 7)
 		{
 			m_running = false;
-			if(m_display->flags & SDL_FULLSCREEN) SDL_WM_ToggleFullScreen(m_display); 
 		}
 		if((int)Event->jbutton.button == 0)
 		{
