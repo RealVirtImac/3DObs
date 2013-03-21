@@ -6,6 +6,7 @@ models/*
 textures/*
 
 !models/quad.obj
+!textures/white.png
 
 3DObs
 
